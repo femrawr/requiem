@@ -5,11 +5,7 @@ import (
 )
 
 func (*PingCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	ses.ChannelMessageSendReply(
-		msg.ChannelID,
-		"Pong.",
-		msg.Reference(),
-	)
+	ses.ChannelMessageSendReply(msg.ChannelID, "Pong.", msg.Reference())
 }
 
 func (*PingCommand) Name() string {

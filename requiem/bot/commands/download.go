@@ -3,36 +3,16 @@ package commands
 import (
 	"fmt"
 	"os"
-	"regexp"
-	"requiem/utils"
 	"strings"
+
+	"requiem/utils"
+	"requiem/utils/discord"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	var urls []string
-
-	content := strings.Join(args, " ")
-
-	regex := regexp.MustCompile(`https?://[^\s]+`)
-
-	matches := regex.FindAllString(content, -1)
-	urls = append(urls, matches...)
-
-	for _, attachment := range msg.Attachments {
-		urls = append(urls, attachment.URL)
-	}
-
-	if msg.ReferencedMessage != nil {
-		for _, attachment := range msg.ReferencedMessage.Attachments {
-			urls = append(urls, attachment.URL)
-		}
-
-		matches := regex.FindAllString(msg.ReferencedMessage.Content, -1)
-		urls = append(urls, matches...)
-	}
-
+	urls := discord.GetUrls(msg)
 	if len(urls) == 0 {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
 		return
@@ -44,6 +24,7 @@ func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 		msg.Reference(),
 	)
 
+	content := strings.Join(args, " ")
 	outPath := utils.UnwrapQuotes(content)
 
 	info, err := os.Stat(outPath)
@@ -54,7 +35,7 @@ func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 	paths, err := utils.DownloadFiles(urls, outPath)
 	if err != nil {
 		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed download - %s", err), msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
 		return
 	}
 

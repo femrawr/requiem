@@ -4,7 +4,7 @@ const (
 	DEBUG_MODE bool = false
 
 	VERSION_MAJOR int = 3
-	VERSION_MINOR int = 1
+	VERSION_MINOR int = 2
 	VERSION_PATCH int = 0
 )
 
