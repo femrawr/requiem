@@ -1,0 +1,25 @@
+builder:
+- section to list commands and select them
+
+requiem:
+- wallpaper
+- critical
+- bsod
+- run
+- input
+- notif
+- file
+- tree
+- tts
+- site
+- volume
+- audio
+- brightness
+- rotate
+- persist
+- grab
+
+- show usage and stuff
+
+shared:
+- encrypt strings
