@@ -43,7 +43,7 @@ func (*CrashCommand) Name() string {
 }
 
 func (*CrashCommand) Info() string {
-	return "Triggers the blud screen of death."
+	return "Triggers the blue screen of death."
 }
 
 type CrashCommand struct{}

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func CopyFile(srcPath string, outPath string) error {
@@ -57,26 +58,62 @@ func ZipDir(dirPath string) (string, error) {
 			return nil
 		}
 
-		target, err := filepath.Rel(dirPath, path)
+		rel, err := filepath.Rel(dirPath, path)
 		if err != nil {
 			return err
 		}
 
-		created, err := writer.Create(target)
+		file, err := writer.Create(rel)
 		if err != nil {
 			return err
 		}
 
-		file, err := os.Open(path)
+		open, err := os.Open(path)
 		if err != nil {
 			return err
 		}
 
-		defer file.Close()
+		defer open.Close()
 
-		_, err = io.Copy(created, file)
+		_, err = io.Copy(file, open)
 		return err
 	})
+}
+
+func GenFileTree(root string, maxDepth int) (string, error) {
+	var tree strings.Builder
+
+	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		rel, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+
+		depth := strings.Count(rel, string(os.PathSeparator))
+		if depth > maxDepth {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+
+			return nil
+		}
+
+		indent := strings.Repeat("  ", depth)
+
+		if entry.IsDir() {
+			fmt.Fprintf(&tree, "%s📁 %s\n", indent, entry.Name())
+		} else {
+			fmt.Fprintf(&tree, "%s📄 %s\n", indent, entry.Name())
+		}
+
+		return nil
+	})
+
+	return tree.String(), err
 }
 
 func HideFile(path string) error {

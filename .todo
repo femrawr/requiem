@@ -2,20 +2,17 @@ builder:
 - section to list commands and select them
 
 requiem:
-- run
 - input
 - notif
-- file
-- tree
 - tts
 - site
 - volume
 - audio
 - brightness
 - rotate
-- persist
 - grab
 
+- rename option for file
 - show usage and stuff
 
 shared:

