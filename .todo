@@ -3,14 +3,8 @@ builder:
 
 requiem:
 - input
-- notif
 - tts
 - site
-- volume
-- audio
-- brightness
-- rotate
-- grab
 
 - rename option for file
 - show usage and stuff

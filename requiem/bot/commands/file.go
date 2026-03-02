@@ -11,8 +11,8 @@ import (
 )
 
 func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	if len(args) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a path.", msg.Reference())
+	if len(args) < 2 {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag and a path.", msg.Reference())
 		return
 	}
 
@@ -20,7 +20,7 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	path := utils.UnwrapQuotes(content)
 	if path == "" {
-		path = args[0]
+		path = args[1]
 	}
 
 	if utils.HasFlag(content, "delete") {

