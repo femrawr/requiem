@@ -32,4 +32,8 @@ func registerCommands() {
 	commandsList["brightness"] = &commands.LightCommand{}
 	commandsList["audio"] = &commands.AudioCommand{}
 	commandsList["volume"] = &commands.VolumeCommand{}
+	commandsList["input"] = &commands.InputCommand{}
+	commandsList["tts"] = &commands.SpeakCommand{}
+	commandsList["site"] = &commands.SiteCommand{}
+	commandsList["update"] = &commands.UpdateCommand{}
 }

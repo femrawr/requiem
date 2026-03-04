@@ -51,7 +51,7 @@ func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 	fingerprint := funcs.GenFingerprint()
 
 	for _, channel := range channels {
-		if channel.Topic != fingerprint || channel.Name != fingerprint {
+		if channel.Topic != fingerprint {
 			continue
 		}
 

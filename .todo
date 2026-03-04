@@ -2,16 +2,11 @@ builder:
 - section to list commands and select them
 
 requiem:
-- input
-- tts
-- site
-- update
-
 - rename option for file
 - show usage and stuff
-- fix not finding based on topic
-- reply for bsod cmd
 - add errors to funcs stuff
+- invalid flag instead of argument
+- success replies to say exactly what was done
 
 shared:
 - encrypt strings

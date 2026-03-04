@@ -20,7 +20,8 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	path := utils.UnwrapQuotes(content)
 	if path == "" {
-		path = args[1]
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the path in double quotes.", msg.Reference())
+		return
 	}
 
 	if utils.HasFlag(content, "delete") {

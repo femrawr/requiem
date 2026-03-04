@@ -18,6 +18,7 @@ var (
 	EnumDisplay   = User32.NewProc("EnumDisplaySettingsA")
 	ChangeDisplay = User32.NewProc("ChangeDisplaySettingsA")
 	MessageBox    = User32.NewProc("MessageBoxW")
+	BlockInput    = User32.NewProc("BlockInput")
 
 	Initialize   = Ole32.NewProc("CoInitialize")
 	Create       = Ole32.NewProc("CoCreateInstance")
