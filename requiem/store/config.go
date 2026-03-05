@@ -1,10 +1,6 @@
 package store
 
 const (
-
-)
-
-const (
 	LAUNCH_KEY string = ""
 
 	MUTEX_NAME string = ""
