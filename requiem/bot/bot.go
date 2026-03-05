@@ -18,7 +18,7 @@ func Start() {
 	bot, err := discordgo.New("Bot " + store.BOT_TOKEN)
 	if err != nil {
 		utils.DebugLog(fmt.Sprintf("failed to create bot - %v", err))
-		funcs.Wipe()
+		funcs.Wipe(false)
 		return
 	}
 
@@ -27,7 +27,7 @@ func Start() {
 	err = bot.Open()
 	if err != nil {
 		utils.DebugLog(fmt.Sprintf("failed to open bot - %v", err))
-		funcs.Wipe()
+		funcs.Wipe(false)
 		return
 	}
 

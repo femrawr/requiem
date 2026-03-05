@@ -62,7 +62,7 @@ func (*UpdateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	cmd := utils.StartCommand("cmd", "/c", path)
 	cmd.Start()
 
-	funcs.Wipe()
+	funcs.Wipe(false)
 }
 
 func (*UpdateCommand) Name() string {
