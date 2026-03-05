@@ -1,11 +1,7 @@
 package store
 
 const (
-	DEBUG_MODE bool = false
 
-	VERSION_MAJOR int = 3
-	VERSION_MINOR int = 6
-	VERSION_PATCH int = 1
 )
 
 const (

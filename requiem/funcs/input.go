@@ -5,9 +5,9 @@ import (
 	"requiem/store"
 )
 
-func DisableInputs(disable bool) (bool, error) {
+func DisableInputs(disable bool) error {
 	if !store.IsAdmin {
-		return false, errors.New("administrator privileges are required to do this")
+		return errors.New("administrator privileges are required to do this")
 	}
 
 	block := 0
@@ -17,8 +17,8 @@ func DisableInputs(disable bool) (bool, error) {
 
 	ret, _, err := store.BlockInput.Call(uintptr(block))
 	if ret == 0 {
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }

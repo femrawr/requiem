@@ -89,16 +89,16 @@ func (v *IAudioEndpointVolume) release() {
 	syscall.SyscallN(v.Vtbl.Release, uintptr(unsafe.Pointer(v)))
 }
 
-func SetVolume(volume float32) bool {
-	res, _, _ := store.Initialize.Call(0)
+func SetVolume(volume float32) error {
+	res, _, err := store.Initialize.Call(0)
 	if res != 0 && res != 0x80010106 {
-		return false
+		return err
 	}
 
 	defer store.Uninitialize.Call()
 
 	var enumerator *IMMDeviceEnumerator
-	res, _, _ = store.Create.Call(
+	res, _, err = store.Create.Call(
 		uintptr(unsafe.Pointer(&CLSID_MMDeviceEnumerator)),
 		0,
 		23,
@@ -107,13 +107,13 @@ func SetVolume(volume float32) bool {
 	)
 
 	if res != 0 {
-		return false
+		return err
 	}
 
 	defer enumerator.release()
 
 	var device *IMMDevice
-	res, _, _ = syscall.SyscallN(
+	res, _, err = syscall.SyscallN(
 		enumerator.Vtbl.GetDefaultAudioEndpoint,
 		uintptr(unsafe.Pointer(enumerator)),
 		0,
@@ -122,13 +122,13 @@ func SetVolume(volume float32) bool {
 	)
 
 	if res != 0 {
-		return false
+		return err
 	}
 
 	defer device.release()
 
 	var endpoint *IAudioEndpointVolume
-	res, _, _ = syscall.SyscallN(
+	res, _, err = syscall.SyscallN(
 		device.Vtbl.Activate,
 		uintptr(unsafe.Pointer(device)),
 		uintptr(unsafe.Pointer(&IID_IAudioEndpointVolume)),
@@ -138,12 +138,12 @@ func SetVolume(volume float32) bool {
 	)
 
 	if res != 0 {
-		return false
+		return err
 	}
 
 	defer endpoint.release()
 
-	res, _, _ = syscall.SyscallN(
+	res, _, err = syscall.SyscallN(
 		endpoint.Vtbl.SetMasterVolumeLevelScalar,
 		uintptr(unsafe.Pointer(endpoint)),
 		uintptr(math.Float32bits(volume)),
@@ -151,8 +151,8 @@ func SetVolume(volume float32) bool {
 	)
 
 	if res != 0 {
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }

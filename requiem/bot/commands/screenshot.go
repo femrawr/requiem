@@ -1,22 +1,25 @@
 package commands
 
 import (
+	"fmt"
+
 	"requiem/funcs"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func (*ScreenshotCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	buffer := funcs.TakeScreenshot()
-	if buffer == nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to take screenshot.", msg.Reference())
+	ss, err := funcs.TakeScreenshot()
+	if err != nil {
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to take screenshot - %s", err), msg.Reference())
+		return
 	}
 
 	ses.ChannelMessageSendComplex(msg.ChannelID, &discordgo.MessageSend{
 		Reference: msg.Reference(),
 		Files: []*discordgo.File{{
 			Name:   "ss.jpg",
-			Reader: buffer,
+			Reader: ss,
 		}},
 	})
 }

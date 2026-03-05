@@ -1,9 +1,11 @@
 package commands
 
 import (
+	"fmt"
+	"strings"
+
 	"requiem/funcs"
 	"requiem/utils"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -12,11 +14,12 @@ func (*CriticalCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 	content := strings.Join(args, " ")
 
 	set := false
+	var err error
 
 	if utils.HasFlag(content, "on") {
-		set = funcs.SetCritical(true)
+		set, err = funcs.SetCritical(true)
 	} else if utils.HasFlag(content, "off") {
-		set = funcs.SetCritical(false)
+		set, err = funcs.SetCritical(false)
 	} else {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
@@ -25,7 +28,7 @@ func (*CriticalCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 	if set {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set as critical.", msg.Reference())
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to set as critical.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set as critical - %s", err), msg.Reference())
 	}
 }
 

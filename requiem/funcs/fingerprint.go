@@ -11,7 +11,6 @@ import (
 
 func GenFingerprint() string {
 	script := `
-        (Get-CimInstance Win32_BIOS).SerialNumber +
         (Get-CimInstance Win32_BaseBoard).SerialNumber +
         (Get-CimInstance Win32_ComputerSystemProduct).UUID +
         (Get-CimInstance Win32_DiskDrive | Select -First 1).SerialNumber

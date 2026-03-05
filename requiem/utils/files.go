@@ -80,15 +80,15 @@ func ZipDir(dirPath string) (string, error) {
 	})
 }
 
-func GenFileTree(root string, maxDepth int) (string, error) {
+func GenFileTree(dirPath string, maxDepth int) (string, error) {
 	var tree strings.Builder
 
-	err := filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+	err := filepath.WalkDir(dirPath, func(path string, entry os.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		rel, err := filepath.Rel(root, path)
+		rel, err := filepath.Rel(dirPath, path)
 		if err != nil {
 			return err
 		}

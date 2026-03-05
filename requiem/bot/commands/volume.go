@@ -27,11 +27,11 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 		return
 	}
 
-	set := funcs.SetVolume(float32(level))
-	if set {
+	err = funcs.SetVolume(float32(level))
+	if err == nil {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set volume.", msg.Reference())
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to set volume.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set volume - %s", err), msg.Reference())
 	}
 }
 

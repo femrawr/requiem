@@ -31,18 +31,18 @@ type DeviceModeA struct {
 	DmDisplayFrequency   uint32
 }
 
-func RotateScreen(by uint32) bool {
+func RotateScreen(by uint32) error {
 	var device DeviceModeA
 	device.DmSize = uint16(unsafe.Sizeof(device))
 
-	ret, _, _ := store.EnumDisplay.Call(
+	ret, _, err := store.EnumDisplay.Call(
 		0,
 		uintptr(0xFFFFFFFF),
 		uintptr(unsafe.Pointer(&device)),
 	)
 
 	if ret == 0 {
-		return false
+		return err
 	}
 
 	if (device.DmDisplayOrientation+by)%2 == 1 {
@@ -52,14 +52,14 @@ func RotateScreen(by uint32) bool {
 	device.DmDisplayOrientation = by
 	device.DmFields = 0x80 | 0x80000 | 0x100000
 
-	ret, _, _ = store.ChangeDisplay.Call(
+	ret, _, err = store.ChangeDisplay.Call(
 		uintptr(unsafe.Pointer(&device)),
 		uintptr(0x01),
 	)
 
 	if ret != 0 {
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }

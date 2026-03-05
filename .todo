@@ -4,7 +4,6 @@ builder:
 requiem:
 - rename option for file
 - show usage and stuff
-- add errors to funcs stuff
 - success replies to say exactly what was done
 - jumpscare cmd
 

