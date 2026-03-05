@@ -18,7 +18,7 @@ func (*CriticalCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 	} else if utils.HasFlag(content, "off") {
 		set = funcs.SetCritical(false)
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid argument.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
 

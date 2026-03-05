@@ -20,7 +20,7 @@ func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	} else if utils.HasFlag(content, "unblock") {
 		blocked, err = funcs.DisableInputs(false)
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid argument.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
 

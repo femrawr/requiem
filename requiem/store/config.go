@@ -5,7 +5,7 @@ const (
 
 	VERSION_MAJOR int = 3
 	VERSION_MINOR int = 6
-	VERSION_PATCH int = 0
+	VERSION_PATCH int = 1
 )
 
 const (

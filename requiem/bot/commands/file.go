@@ -33,7 +33,7 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully deleted - %s", path), msg.Reference())
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid argument.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
 }

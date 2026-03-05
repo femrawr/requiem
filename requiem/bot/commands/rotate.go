@@ -23,7 +23,7 @@ func (*RotateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	} else if utils.HasFlag(content, "270") {
 		rotated = funcs.RotateScreen(3)
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid argument.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
 
