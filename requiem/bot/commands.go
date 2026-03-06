@@ -2,17 +2,10 @@ package bot
 
 import (
 	"requiem/bot/commands"
-
-	"github.com/bwmarrin/discordgo"
+	"requiem/store"
 )
 
-type command interface {
-	Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string)
-	Name() string
-	Info() string
-}
-
-var commandsList = make(map[string]command)
+var commandsList = make(map[string]store.Command)
 
 func registerCommands() {
 	commandsList["ping"] = &commands.PingCommand{}
@@ -36,4 +29,5 @@ func registerCommands() {
 	commandsList["tts"] = &commands.SpeakCommand{}
 	commandsList["site"] = &commands.SiteCommand{}
 	commandsList["update"] = &commands.UpdateCommand{}
+	commandsList["macro"] = &commands.MacroCommand{}
 }

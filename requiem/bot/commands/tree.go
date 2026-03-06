@@ -27,7 +27,7 @@ func (*TreeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 	depth := 2
 
 	num, err := strconv.Atoi(args[len(args)-1])
-	if err == nil {
+	if err == nil && num != 0 {
 		depth = num
 	}
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/macro"
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
@@ -71,6 +72,8 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 			)
 		}
 	}()
+
+	macro.Init(commandsList, ses, msg)
 
 	if msg.Author.ID == ses.State.User.ID {
 		return

@@ -1,4 +1,5 @@
 builder:
+- make it
 - section to list commands and select them
 
 requiem:
@@ -6,6 +7,7 @@ requiem:
 - show usage and stuff
 - success replies to say exactly what was done
 - jumpscare cmd
+- gps cmd
+- let macros persist
 
 shared:
-- encrypt strings

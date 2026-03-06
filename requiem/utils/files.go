@@ -93,8 +93,12 @@ func GenFileTree(dirPath string, maxDepth int) (string, error) {
 			return err
 		}
 
+		if rel == "." {
+			return nil
+		}
+
 		depth := strings.Count(rel, string(os.PathSeparator))
-		if depth > maxDepth {
+		if depth >= maxDepth {
 			if entry.IsDir() {
 				return filepath.SkipDir
 			}
@@ -102,12 +106,30 @@ func GenFileTree(dirPath string, maxDepth int) (string, error) {
 			return nil
 		}
 
-		indent := strings.Repeat("  ", depth)
+		prefix := ""
+		for _ = range depth {
+			prefix += "│   "
+		}
+
+		parent := filepath.Dir(path)
+
+		items, err := os.ReadDir(parent)
+		if err != nil {
+			return err
+		}
+
+		isLast := items[len(items)-1].Name() == entry.Name()
+
+		if isLast {
+			prefix += "└── "
+		} else {
+			prefix += "├── "
+		}
 
 		if entry.IsDir() {
-			fmt.Fprintf(&tree, "%s📁 %s\n", indent, entry.Name())
+			fmt.Fprintf(&tree, "%s📁 %s\n", prefix, entry.Name())
 		} else {
-			fmt.Fprintf(&tree, "%s📄 %s\n", indent, entry.Name())
+			fmt.Fprintf(&tree, "%s📄 %s\n", prefix, entry.Name())
 		}
 
 		return nil

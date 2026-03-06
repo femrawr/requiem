@@ -16,6 +16,7 @@ func (*ScreenshotCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCre
 	}
 
 	ses.ChannelMessageSendComplex(msg.ChannelID, &discordgo.MessageSend{
+		Content:   "🟩 Successfully captured.",
 		Reference: msg.Reference(),
 		Files: []*discordgo.File{{
 			Name:   "ss.jpg",
