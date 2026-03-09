@@ -62,17 +62,6 @@ func Start() {
 }
 
 func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			ses.ChannelMessageSendReply(
-				msg.ChannelID,
-				fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
-				msg.Reference(),
-			)
-		}
-	}()
-
 	macro.Init(commandsList, ses, msg)
 
 	if msg.Author.ID == ses.State.User.ID {
@@ -124,13 +113,27 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 
 	command, exists := commandsList[name]
-	if exists {
-		go command.Exec(ses, msg, parts[1:])
-	} else {
+	if !exists {
 		ses.ChannelMessageSendReply(
 			msg.ChannelID,
 			"This command does not exist.",
 			msg.Reference(),
 		)
+
+		return
 	}
+
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				ses.ChannelMessageSendReply(
+					msg.ChannelID,
+					fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
+					msg.Reference(),
+				)
+			}
+		}()
+
+		command.Exec(ses, msg, parts[1:])
+	}()
 }

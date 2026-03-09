@@ -30,4 +30,5 @@ func registerCommands() {
 	commandsList["site"] = &commands.SiteCommand{}
 	commandsList["update"] = &commands.UpdateCommand{}
 	commandsList["macro"] = &commands.MacroCommand{}
+	commandsList["jumpscare"] = &commands.ScareCommand{}
 }

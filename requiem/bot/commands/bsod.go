@@ -1,8 +1,9 @@
 package commands
 
 import (
-	"requiem/store"
 	"unsafe"
+
+	"requiem/store"
 
 	"github.com/bwmarrin/discordgo"
 )

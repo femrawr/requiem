@@ -24,19 +24,24 @@ func (*NotifCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		return
 	}
 
-	ret, _, err := store.MessageBox.Call(
-		uintptr(0),
-		uintptr(unsafe.Pointer(pointer)),
-		uintptr(0),
-		uintptr(0x00000000|0x00040000),
-	)
+	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully sent messagebox.", msg.Reference())
 
-	if ret == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create messagebox - %s", err), msg.Reference())
-		return
-	}
+	go func() {
+		ret, _, err := store.MessageBox.Call(
+			uintptr(0),
+			uintptr(unsafe.Pointer(pointer)),
+			uintptr(0),
+			uintptr(0x00000000|0x00040000|0x00001000),
+		)
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully sent messagebox.", msg.Reference())
+		if ret == 0 {
+			ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
+			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create messagebox - %s", err), msg.Reference())
+			return
+		}
+
+		ses.ChannelMessageSendReply(msg.ChannelID, "Messagebox acknowledgeded.", msg.Reference())
+	}()
 }
 
 func (*NotifCommand) Name() string {

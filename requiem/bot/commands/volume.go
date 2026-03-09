@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"requiem/funcs"
 	"strconv"
 	"strings"
+
+	"requiem/funcs"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -27,7 +28,7 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 		return
 	}
 
-	err = funcs.SetVolume(float32(level))
+	err = funcs.SetVolume(float32(level) / 100.0)
 	if err == nil {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set volume.", msg.Reference())
 	} else {

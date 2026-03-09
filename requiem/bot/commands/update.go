@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
+
 	"requiem/funcs"
 	"requiem/utils"
 	"requiem/utils/discord"
-	"strings"
-	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -70,7 +71,7 @@ func (*UpdateCommand) Name() string {
 }
 
 func (*UpdateCommand) Info() string {
-	return "Updates requiem."
+	return "Updates Requiem."
 }
 
 type UpdateCommand struct{}

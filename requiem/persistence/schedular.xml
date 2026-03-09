@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-16"?>
+
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+    <RegistrationInfo>
+        <Author>Microsoft Corporation</Author>
+        <URI>\%THE_NAME%</URI>
+    </RegistrationInfo>
+
+    <Principals>
+        <Principal id="Author">
+            <LogonType>InteractiveToken</LogonType>
+            <RunLevel>HighestAvailable</RunLevel>
+        </Principal>
+    </Principals>
+
+    <Settings>
+        <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+        <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+        <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+        <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+
+        <RestartOnFailure>
+            <Count>20</Count>
+            <Interval>PT1M</Interval>
+        </RestartOnFailure>
+
+        <Hidden>false</Hidden>
+        <Enabled>true</Enabled>
+    </Settings>
+
+    <Triggers>
+        <LogonTrigger>
+            <Enabled>true</Enabled>
+
+            <Repetition>
+                <Interval>PT8M</Interval>
+                <StopAtDurationEnd>false</StopAtDurationEnd>
+            </Repetition>
+        </LogonTrigger>
+    </Triggers>
+
+    <Actions>
+        <Exec>
+            <Command>%THE_CMD%</Command>
+            <Arguments>%THE_ARG%</Arguments>
+        </Exec>
+    </Actions>
+</Task>

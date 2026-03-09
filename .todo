@@ -3,11 +3,16 @@ builder:
 - section to list commands and select them
 
 requiem:
-- rename option for file
+- rename, flood option for file
 - show usage and stuff
 - success replies to say exactly what was done
-- jumpscare cmd
 - gps cmd
 - let macros persist
+- fix deleting when admin
+- add macro wait symbol
+- simulate keypresses
 
 shared:
+
+wiki:
+- add visuals

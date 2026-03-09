@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"requiem/utils"
 	"strings"
+
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )

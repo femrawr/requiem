@@ -20,7 +20,7 @@ func (*PersistCommand) Name() string {
 }
 
 func (*PersistCommand) Info() string {
-	return "Re-persists requiem if it was disabled."
+	return "Re-persists Requiem if it was disabled."
 }
 
 type PersistCommand struct{}
