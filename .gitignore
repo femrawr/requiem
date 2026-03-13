@@ -1,2 +1,4 @@
 /.wiki
-/.build
+/.builds
+
+*.exe

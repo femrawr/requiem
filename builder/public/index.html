@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Requiem builder</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="sidebar">
+                <div class="tab-container">
+                    <button class="tab-button active" data-tab="bot">bot</button>
+                    <button class="tab-button" data-tab="setup">setup</button>
+                    <button class="tab-button" data-tab="options">options</button>
+                    <button class="tab-button" data-tab="persistence">persistence</button>
+                    <button class="tab-button" data-tab="commands">commands</button>
+                </div>
+
+                <div style="flex: 1;"></div>
+
+                <div class="actions">
+                    <div class="build-tag">default</div>
+                    <button class="build-button" id="build">build</button>
+                </div>
+            </div>
+
+            <main class="main">
+                <div class="panel">
+                    <div class="content active" id="bot-tab"></div>
+                    <div class="content" id="options-tab"></div>
+                    <div class="content" id="setup-tab"></div>
+                    <div class="content" id="persistence-tab"></div>
+                    <div class="content" id="commands-tab"></div>
+                </div>
+            </main>
+        </div>
+
+        <div class="notifs"></div>
+    </body>
+
+    <script>
+        const TAG_NAME = 'req.tag';
+        const CFG_NAME = 'req.cfg';
+    </script>
+
+    <script src="js/ui-settings.js"></script>
+    <script src="js/ui-tag.js"></script>
+    <script src="js/ui-notifs.js"></script>
+    <script src="js/main-saving.js"></script>
+    <script src="js/main-build.js"></script>
+</html>

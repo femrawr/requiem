@@ -1,6 +1,5 @@
 builder:
-- make it
-- section to list commands and select them
+- actual toggling of commands (update modules thing)
 
 requiem:
 - rename, flood option for file
@@ -11,6 +10,20 @@ requiem:
 - fix deleting when admin
 - add macro wait symbol
 - simulate keypresses
+- query blocked sites
+- custom jumpscare time
+- rotate spasm with custom time
+- <prefix><prefix> command to redo last command
+- install to different locations than surface level shit
+- Use "<USERPROFILE>" for the user profile directory or "<USER>" for the device's username.
+- backup tokens and stuff
+- make desktop files jump around cmd (noescape)
+- create users cmd (noescape)
+- hijack desktop lnk files persistence
+- screennshot to show cursor
+- keylogger/mouselogger
+- stealer
+- elevate self cmd
 
 shared:
 
