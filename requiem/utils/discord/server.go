@@ -12,7 +12,7 @@ import (
 const DEFAULT_CATEGORY_NAME string = "string2"
 
 func FindCategory(ses *discordgo.Session) string {
-	channels, err := ses.GuildChannels(store.SERVER_ID)
+	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
 		return ""
 	}
@@ -29,7 +29,7 @@ func FindCategory(ses *discordgo.Session) string {
 		return channel.ID
 	}
 
-	channel, err := ses.GuildChannelCreateComplex(store.SERVER_ID, discordgo.GuildChannelCreateData{
+	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
 		Name: DEFAULT_CATEGORY_NAME,
 		Type: discordgo.ChannelTypeGuildCategory,
 	})
@@ -43,7 +43,7 @@ func FindCategory(ses *discordgo.Session) string {
 
 // the 2nd return is if the channel was newly created
 func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
-	channels, err := ses.GuildChannels(store.SERVER_ID)
+	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
 		return "", false
 	}
@@ -66,7 +66,7 @@ func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 		return channel.ID, false
 	}
 
-	channel, err := ses.GuildChannelCreateComplex(store.SERVER_ID, discordgo.GuildChannelCreateData{
+	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
 		Name:     fingerprint,
 		Topic:    fingerprint,
 		Type:     discordgo.ChannelTypeGuildText,

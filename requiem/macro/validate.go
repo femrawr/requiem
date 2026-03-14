@@ -74,7 +74,7 @@ func hasValidFormat(file *os.File) error {
 
 		symbol := fields[0]
 		if symbol != strings.ToUpper(symbol) {
-			return fmt.Errorf("the file contains an invalid symbol: \"%s\"", symbol)
+			return fmt.Errorf("the file contains an invalid symbol: %q", symbol)
 		}
 	}
 

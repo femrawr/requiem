@@ -3,6 +3,10 @@ package store
 import "os"
 
 var (
+	DecryptedServerID string
+)
+
+var (
 	IsAdmin bool
 
 	ExecPath string

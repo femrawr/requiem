@@ -113,7 +113,7 @@ func main() {
 	)
 
 	utils.DebugLog(fmt.Sprintf(
-		"relaunching - \"%s\" -> \"%s\" %s",
+		"relaunching - %q -> %q %s",
 		store.ExecPath,
 		newExecPath,
 		store.LAUNCH_KEY,

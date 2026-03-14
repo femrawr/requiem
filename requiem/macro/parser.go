@@ -60,11 +60,11 @@ func parseLine(line string) (Line, error) {
 	symbol := fields[0]
 	id, ok := symbols[symbol]
 	if !ok {
-		return Line{}, fmt.Errorf("invalid symbol: \"%s\"", symbol)
+		return Line{}, fmt.Errorf("invalid symbol: %q", symbol)
 	}
 
 	if len(fields) < 2 {
-		return Line{}, fmt.Errorf("symbol \"%s\" does not have a trailing value", symbol)
+		return Line{}, fmt.Errorf("symbol %q does not have a trailing value", symbol)
 	}
 
 	return Line{

@@ -58,14 +58,14 @@ func runLine(symbol, value string, args []string) error {
 	case "0": // CMD
 		return execDiscordCommand(value, args)
 	default:
-		return fmt.Errorf("invalid symbol id: \"%s\"", symbol)
+		return fmt.Errorf("invalid symbol id: %q", symbol)
 	}
 }
 
 func execDiscordCommand(cmd string, args []string) error {
 	command, exists := cmdList[cmd]
 	if !exists {
-		return fmt.Errorf("command \"%s\" does not exist", cmd)
+		return fmt.Errorf("command %q does not exist", cmd)
 	}
 
 	go command.Exec(session, message, args)

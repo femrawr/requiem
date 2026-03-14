@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -14,6 +15,17 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	content := strings.Join(args, " ")
 	if len(content) < 1 {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a volume level.", msg.Reference())
+		return
+	}
+
+	if utils.HasFlag(content, "toggle") {
+		err := utils.RunCommand("powershell", "-c", "(New-Object -ComObject WScript.Shell).SendKeys([char]173)")
+		if err != nil {
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to toggle mute.", msg.Reference())
+			return
+		}
+
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully toggled mute.", msg.Reference())
 		return
 	}
 

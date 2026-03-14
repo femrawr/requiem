@@ -30,7 +30,7 @@ func GetConnectionMsg(new bool) string {
 	)
 
 	info := fmt.Sprintf(
-		"Elevated: %t\nProcess Path: \"%s\"\nProcess ID: %d\nHome Path: \"%s\"",
+		"Elevated: %t\nProcess Path: %q\nProcess ID: %d\nHome Path: %q",
 		store.IsAdmin,
 		store.ExecPath,
 		os.Getpid(),

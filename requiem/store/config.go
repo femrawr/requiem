@@ -4,6 +4,8 @@ const (
 	LAUNCH_KEY string = ""
 
 	MUTEX_NAME string = ""
+
+	CRYPTO_KEY string = ""
 )
 
 const (

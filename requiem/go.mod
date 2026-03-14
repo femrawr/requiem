@@ -2,6 +2,9 @@ module requiem
 
 go 1.24.3
 
+require shared v0.0.0
+replace shared => ../shared
+
 require github.com/bwmarrin/discordgo v0.29.0
 
 require github.com/vova616/screenshot v0.0.0-20220801010501-56c10359473c
