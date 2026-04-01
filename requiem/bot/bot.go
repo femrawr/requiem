@@ -13,7 +13,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var targetChannel string
+var (
+	targetChannel string
+
+	lastCommand   string
+	lastArguments []string
+)
 
 func Start() {
 	store.DecryptedServerID = utils.Decrypt(store.SERVER_ID)
@@ -34,6 +39,8 @@ func Start() {
 		return
 	}
 
+	macro.LoadMacros()
+	store.LoadSettings()
 	registerCommands()
 
 	categoryID := utils.Decrypt(store.CATEGORY_ID)
@@ -60,6 +67,7 @@ func Start() {
 		}},
 	})
 
+	utils.DebugLog("started")
 	select {}
 }
 
@@ -80,6 +88,25 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 	}
 
 	name := strings.ToLower(parts[0])
+	args := parts[1:]
+
+	if name == store.COMMAND_PREFIX && lastCommand != "" {
+		go func() {
+			defer func() {
+				if err := recover(); err != nil {
+					ses.ChannelMessageSendReply(
+						msg.ChannelID,
+						fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
+						msg.Reference(),
+					)
+				}
+			}()
+
+			commandsList[lastCommand].Exec(ses, msg, lastArguments)
+		}()
+
+		return
+	}
 
 	if name == "list" {
 		link := fmt.Sprintf(
@@ -125,6 +152,9 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
+	lastCommand = name
+	lastArguments = args
+
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
@@ -136,6 +166,6 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 			}
 		}()
 
-		command.Exec(ses, msg, parts[1:])
+		command.Exec(ses, msg, args)
 	}()
 }

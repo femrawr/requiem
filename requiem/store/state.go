@@ -4,6 +4,8 @@ import "os"
 
 var (
 	DecryptedServerID string
+
+	DecryptedPersistenceName string
 )
 
 var (

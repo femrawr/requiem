@@ -49,7 +49,7 @@
         },
         {
             "name": "Use custom name",
-            "info": "Rename Requiem to a custom name. If unchecked, Requiem will set its name to \"svchost\".",
+            "info": "Rename Requiem to a custom name.",
             "type": "checkbox"
         },
         {

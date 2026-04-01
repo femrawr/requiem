@@ -37,6 +37,7 @@ func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	if ret != 0 {
 		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to trigger crash.", msg.Reference())
+		return
 	}
 
 	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)

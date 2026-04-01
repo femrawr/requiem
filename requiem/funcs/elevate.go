@@ -1,6 +1,7 @@
 package funcs
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -11,8 +12,7 @@ func Elevate() {
 	if store.FORCE_ADMIN {
 		for {
 			cmd := exec.Command("powershell", "-c",
-				"Start-Process", "\""+store.ExecPath+"\"",
-				"-Verb", "RunAs",
+				fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
 			)
 
 			err := cmd.Run()
@@ -26,8 +26,7 @@ func Elevate() {
 
 	if store.PROMPT_ADMIN {
 		cmd := exec.Command("powershell", "-c",
-			"Start-Process", "\""+store.ExecPath+"\"",
-			"-Verb", "RunAs",
+			fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
 		)
 
 		err := cmd.Run()

@@ -6,14 +6,9 @@ requiem:
 - show usage and stuff
 - success replies to say exactly what was done
 - gps cmd
-- let macros persist
 - fix deleting when admin
-- add macro wait symbol
 - simulate keypresses
-- query blocked sites
 - custom jumpscare time
-- rotate spasm with custom time
-- <prefix><prefix> command to redo last command
 - install to different locations than surface level shit
 - Use "<USERPROFILE>" for the user profile directory or "<USER>" for the device's username.
 - backup tokens and stuff
@@ -22,7 +17,6 @@ requiem:
 - hijack desktop lnk files persistence
 - screennshot to show cursor
 - keylogger/mouselogger
-- stealer
 - elevate self cmd
 
 shared:

@@ -17,5 +17,5 @@ func TestGenerateFileTree(test *testing.T) {
 		return
 	}
 
-	fmt.Printf("Generated tree -\n%s", tree)
+	fmt.Printf("Generated tree -\n%s\n", tree)
 }

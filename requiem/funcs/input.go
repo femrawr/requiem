@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"errors"
+
 	"requiem/store"
 )
 
@@ -10,12 +11,12 @@ func DisableInputs(disable bool) error {
 		return errors.New("administrator privileges are required to do this")
 	}
 
-	block := 0
+	disabled := 0
 	if disable {
-		block = 1
+		disabled = 1
 	}
 
-	ret, _, err := store.BlockInput.Call(uintptr(block))
+	ret, _, err := store.BlockInput.Call(uintptr(disabled))
 	if ret == 0 {
 		return err
 	}

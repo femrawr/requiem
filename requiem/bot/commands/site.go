@@ -38,7 +38,7 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	site = strings.Replace(site, "https://", "", 1)
 	site = strings.Replace(site, "http://", "", 1)
-	site = fmt.Sprintf("127.0.0.1 %s", site)
+	site = fmt.Sprintf("0.0.0.0 %s", site)
 
 	if utils.HasFlag(content, "block") {
 		scanner := bufio.NewScanner(file)
@@ -58,7 +58,10 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		}
 
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully blocked website.", msg.Reference())
-	} else if utils.HasFlag(content, "unblock") {
+		return
+	}
+
+	if utils.HasFlag(content, "unblock") {
 		data, err := os.ReadFile(path)
 		if err != nil {
 			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read file - %s", err), msg.Reference())
@@ -89,10 +92,41 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		}
 
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unblocked website.", msg.Reference())
-	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 		return
 	}
+
+	if utils.HasFlag(content, "list") {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read file - %s", err), msg.Reference())
+			return
+		}
+
+		var sites []string
+		for line := range strings.SplitSeq(string(data), "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" || strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			parts := strings.Fields(line)
+			if len(parts) < 2 {
+				continue
+			}
+
+			sites = append(sites, parts[1])
+		}
+
+		if len(sites) == 0 {
+			ses.ChannelMessageSendReply(msg.ChannelID, "There are no blocked sites.", msg.Reference())
+			return
+		}
+
+		ses.ChannelMessageSendReply(msg.ChannelID, "Blocked sites:\n```\n"+strings.Join(sites, "\n")+"```", msg.Reference())
+		return
+	}
+
+	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 }
 
 func (*SiteCommand) Name() string {

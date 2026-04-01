@@ -25,5 +25,5 @@ func TestParseMacro(test *testing.T) {
 		return
 	}
 
-	fmt.Printf("Parsed - %s", parsed.Encode())
+	fmt.Printf("Parsed - %s\n", parsed.Encode())
 }

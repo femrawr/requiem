@@ -9,21 +9,21 @@ import (
 )
 
 var (
-	CLSID_MMDeviceEnumerator syscall.GUID = syscall.GUID{
+	mmDeviceEnumerator = syscall.GUID{
 		Data1: 0xBCDE0395,
 		Data2: 0xE52F,
 		Data3: 0x467C,
 		Data4: [8]byte{0x8E, 0x3D, 0xC4, 0x57, 0x92, 0x91, 0x69, 0x2E},
 	}
 
-	IID_IMMDeviceEnumerator syscall.GUID = syscall.GUID{
+	immDeviceEnumerator = syscall.GUID{
 		Data1: 0xA95664D2,
 		Data2: 0x9614,
 		Data3: 0x4F35,
 		Data4: [8]byte{0xA7, 0x46, 0xDE, 0x8D, 0xB6, 0x36, 0x17, 0xE6},
 	}
 
-	IID_IAudioEndpointVolume syscall.GUID = syscall.GUID{
+	audioEndpointVolume = syscall.GUID{
 		Data1: 0x5CDF2C82,
 		Data2: 0x841E,
 		Data3: 0x4546,
@@ -31,7 +31,7 @@ var (
 	}
 )
 
-type IMMDeviceEnumeratorVTBL struct {
+type deviceEnumerator struct {
 	QueryInterface                         uintptr
 	AddRef                                 uintptr
 	Release                                uintptr
@@ -42,7 +42,7 @@ type IMMDeviceEnumeratorVTBL struct {
 	UnregisterEndpointNotificationCallback uintptr
 }
 
-type IMMDeviceVTBL struct {
+type device struct {
 	QueryInterface    uintptr
 	AddRef            uintptr
 	Release           uintptr
@@ -52,7 +52,7 @@ type IMMDeviceVTBL struct {
 	GetState          uintptr
 }
 
-type IAudioEndpointVolumeVTBL struct {
+type endpointVolume struct {
 	QueryInterface                uintptr
 	AddRef                        uintptr
 	Release                       uintptr
@@ -63,88 +63,124 @@ type IAudioEndpointVolumeVTBL struct {
 	SetMasterVolumeLevelScalar    uintptr
 	GetMasterVolumeLevel          uintptr
 	GetMasterVolumeLevelScalar    uintptr
+	SetChannelVolumeLevel         uintptr
+	SetChannelVolumeLevelScalar   uintptr
+	GetChannelVolumeLevel         uintptr
+	GetChannelVolumeLevelScalar   uintptr
+	SetMute                       uintptr
+	GetMute                       uintptr
 }
 
-type IMMDeviceEnumerator struct {
-	Vtbl *IMMDeviceEnumeratorVTBL
+type deviceEnumeratorStruct struct {
+	Table *deviceEnumerator
 }
 
-type IMMDevice struct {
-	Vtbl *IMMDeviceVTBL
+type deviceStruct struct {
+	Table *device
 }
 
-type IAudioEndpointVolume struct {
-	Vtbl *IAudioEndpointVolumeVTBL
+type endpointVolumeStruct struct {
+	Table *endpointVolume
 }
 
-func (v *IMMDeviceEnumerator) release() {
-	syscall.SyscallN(v.Vtbl.Release, uintptr(unsafe.Pointer(v)))
+func (v *deviceEnumeratorStruct) release() {
+	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
 }
 
-func (v *IMMDevice) release() {
-	syscall.SyscallN(v.Vtbl.Release, uintptr(unsafe.Pointer(v)))
+func (v *deviceStruct) release() {
+	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
 }
 
-func (v *IAudioEndpointVolume) release() {
-	syscall.SyscallN(v.Vtbl.Release, uintptr(unsafe.Pointer(v)))
+func (v *endpointVolumeStruct) release() {
+	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
 }
 
-func SetVolume(volume float32) error {
-	res, _, err := store.Initialize.Call(0)
-	if res != 0 && res != 0x80010106 {
+func SetMuted(mute bool) error {
+	err := checkInit()
+	if err != nil {
 		return err
 	}
 
 	defer store.Uninitialize.Call()
 
-	var enumerator *IMMDeviceEnumerator
-	res, _, err = store.Create.Call(
-		uintptr(unsafe.Pointer(&CLSID_MMDeviceEnumerator)),
-		0,
-		23,
-		uintptr(unsafe.Pointer(&IID_IMMDeviceEnumerator)),
-		uintptr(unsafe.Pointer(&enumerator)),
-	)
-
-	if res != 0 {
+	enumerator, device, endpoint, err := getDeviceEndpoint()
+	if err != nil {
 		return err
 	}
 
 	defer enumerator.release()
-
-	var device *IMMDevice
-	res, _, err = syscall.SyscallN(
-		enumerator.Vtbl.GetDefaultAudioEndpoint,
-		uintptr(unsafe.Pointer(enumerator)),
-		0,
-		0,
-		uintptr(unsafe.Pointer(&device)),
-	)
-
-	if res != 0 {
-		return err
-	}
-
 	defer device.release()
-
-	var endpoint *IAudioEndpointVolume
-	res, _, err = syscall.SyscallN(
-		device.Vtbl.Activate,
-		uintptr(unsafe.Pointer(device)),
-		uintptr(unsafe.Pointer(&IID_IAudioEndpointVolume)),
-		23,
-		0,
-		uintptr(unsafe.Pointer(&endpoint)),
-	)
-
-	if res != 0 {
-		return err
-	}
-
 	defer endpoint.release()
 
-	res, _, err = syscall.SyscallN(
-		endpoint.Vtbl.SetMasterVolumeLevelScalar,
+	muted := 0
+	if mute {
+		muted = 1
+	}
+
+	res, _, err := syscall.SyscallN(
+		endpoint.Table.SetMute,
+		uintptr(unsafe.Pointer(endpoint)),
+		uintptr(muted),
+		0,
+	)
+
+	if res != 0 {
+		return err
+	}
+
+	return nil
+}
+
+func GetMuted() (bool, error) {
+	err := checkInit()
+	if err != nil {
+		return false, err
+	}
+
+	defer store.Uninitialize.Call()
+
+	enumerator, device, endpoint, err := getDeviceEndpoint()
+	if err != nil {
+		return false, err
+	}
+
+	defer enumerator.release()
+	defer device.release()
+	defer endpoint.release()
+
+	var muted int32
+	res, _, err := syscall.SyscallN(
+		endpoint.Table.GetMute,
+		uintptr(unsafe.Pointer(endpoint)),
+		uintptr(unsafe.Pointer(&muted)),
+	)
+
+	if res != 0 {
+		return false, err
+	}
+
+	return muted != 0, nil
+}
+
+func SetVolume(volume float32) error {
+	err := checkInit()
+	if err != nil {
+		return err
+	}
+
+	defer store.Uninitialize.Call()
+
+	enumerator, device, endpoint, err := getDeviceEndpoint()
+	if err != nil {
+		return err
+	}
+
+	defer enumerator.release()
+	defer device.release()
+	defer endpoint.release()
+
+	res, _, err := syscall.SyscallN(
+		endpoint.Table.SetMasterVolumeLevelScalar,
 		uintptr(unsafe.Pointer(endpoint)),
 		uintptr(math.Float32bits(volume)),
 		0,
@@ -155,4 +191,60 @@ func SetVolume(volume float32) error {
 	}
 
 	return nil
+}
+
+func checkInit() error {
+	res, _, err := store.Initialize.Call(0)
+	if res != 0 && res != 0x80010106 {
+		return err
+	}
+
+	return nil
+}
+
+func getDeviceEndpoint() (*deviceEnumeratorStruct, *deviceStruct, *endpointVolumeStruct, error) {
+	var enumerator *deviceEnumeratorStruct
+	res, _, err := store.Create.Call(
+		uintptr(unsafe.Pointer(&mmDeviceEnumerator)),
+		0,
+		23,
+		uintptr(unsafe.Pointer(&immDeviceEnumerator)),
+		uintptr(unsafe.Pointer(&enumerator)),
+	)
+
+	if res != 0 {
+		return nil, nil, nil, err
+	}
+
+	var device *deviceStruct
+	res, _, err = syscall.SyscallN(
+		enumerator.Table.GetDefaultAudioEndpoint,
+		uintptr(unsafe.Pointer(enumerator)),
+		0,
+		0,
+		uintptr(unsafe.Pointer(&device)),
+	)
+
+	if res != 0 {
+		enumerator.release()
+		return nil, nil, nil, err
+	}
+
+	var endpoint *endpointVolumeStruct
+	res, _, err = syscall.SyscallN(
+		device.Table.Activate,
+		uintptr(unsafe.Pointer(device)),
+		uintptr(unsafe.Pointer(&audioEndpointVolume)),
+		23,
+		0,
+		uintptr(unsafe.Pointer(&endpoint)),
+	)
+
+	if res != 0 {
+		device.release()
+		enumerator.release()
+		return nil, nil, nil, err
+	}
+
+	return enumerator, device, endpoint, nil
 }

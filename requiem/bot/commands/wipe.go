@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"strings"
 
 	"requiem/funcs"
@@ -15,7 +16,16 @@ func (*WipeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 	content := strings.Join(args, " ")
 	secure := utils.HasFlag(content, "secure")
 
-	funcs.Wipe(secure)
+	err := ses.Close()
+	if err != nil {
+		ses.ChannelMessageEdit(msg.ChannelID, initial.ID, fmt.Sprintf("🟥 Failed to close bot session - %s", err))
+	}
+
+	err = funcs.Wipe(secure)
+	if err != nil {
+		ses.ChannelMessageEdit(msg.ChannelID, initial.ID, fmt.Sprintf("🟥 Failed to wipe - %s", err))
+		return
+	}
 
 	ses.ChannelMessageEdit(msg.ChannelID, initial.ID, "🟥 Failed to wipe.")
 }

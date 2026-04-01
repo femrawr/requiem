@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
 
@@ -78,6 +80,18 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "Playing audio...", msg.Reference())
 
+	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
+		funcs.DisableInputs(true)
+	}
+
+	if store.RuntimeSettings.AudioUnmuteBeforePlay {
+		funcs.SetMuted(false)
+	}
+
+	if store.RuntimeSettings.AudioMaxVolumeBeforePlay {
+		funcs.SetVolume(1)
+	}
+
 	player := context.NewPlayer()
 	defer player.Close()
 
@@ -101,6 +115,10 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to write audio data - %s", err), msg.Reference())
 			return
 		}
+	}
+
+	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
+		funcs.DisableInputs(false)
 	}
 
 	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)

@@ -3,8 +3,10 @@ package macro
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"requiem/store"
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -53,10 +55,18 @@ func RunMacro(macro string) error {
 	return nil
 }
 
-func runLine(symbol, value string, args []string) error {
+func runLine(symbol string, value string, args []string) error {
 	switch symbol {
 	case "0": // CMD
 		return execDiscordCommand(value, args)
+	case "1": // WAIT
+		secs, found := utils.FindNumber(value)
+		if !found {
+			return fmt.Errorf("invalid wait value: %q", value)
+		}
+
+		time.Sleep(time.Duration(secs) * time.Second)
+		return nil
 	default:
 		return fmt.Errorf("invalid symbol id: %q", symbol)
 	}
@@ -68,7 +78,19 @@ func execDiscordCommand(cmd string, args []string) error {
 		return fmt.Errorf("command %q does not exist", cmd)
 	}
 
-	go command.Exec(session, message, args)
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				session.ChannelMessageSendReply(
+					message.ChannelID,
+					fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
+					message.Reference(),
+				)
+			}
+		}()
+
+		command.Exec(session, message, args)
+	}()
 
 	return nil
 }

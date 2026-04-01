@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"requiem/store"
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -21,12 +22,17 @@ func GetConnectionMsg(new bool) string {
 		message = "Requiem has connected to a new device."
 	}
 
+	trackingID := ""
+	if store.TRACKING_ID != "" {
+		trackingID = " - " + utils.Decrypt(store.TRACKING_ID)
+	}
+
 	version := fmt.Sprintf(
-		"[%d.%d.%d - %s]",
+		"[%d.%d.%d%s]",
 		store.VERSION_MAJOR,
 		store.VERSION_MINOR,
 		store.VERSION_PATCH,
-		store.TRACKING_ID,
+		trackingID,
 	)
 
 	info := fmt.Sprintf(

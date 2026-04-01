@@ -18,9 +18,7 @@ func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, ar
 
 	if args[0] == "cmd" {
 		args = append([]string{"cmd", "/c"}, args[1:]...)
-	}
-
-	if args[0] == "powershell" {
+	} else if args[0] == "powershell" {
 		args = append([]string{"powershell", "-c"}, args[1:]...)
 	}
 

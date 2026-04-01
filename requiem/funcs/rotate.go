@@ -6,7 +6,7 @@ import (
 	"requiem/store"
 )
 
-type DeviceModeA struct {
+type deviceMode struct {
 	DmDeviceName         [32]byte
 	DmSpecVersion        uint16
 	DmDriverVersion      uint16
@@ -32,7 +32,7 @@ type DeviceModeA struct {
 }
 
 func RotateScreen(by uint32) error {
-	var device DeviceModeA
+	var device deviceMode
 	device.DmSize = uint16(unsafe.Sizeof(device))
 
 	ret, _, err := store.EnumDisplay.Call(

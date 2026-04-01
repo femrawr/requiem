@@ -7,7 +7,8 @@ const (
 )
 
 var symbols = map[string]string{
-	"CMD": "0",
+	"CMD":  "0",
+	"WAIT": "1",
 }
 
 type Line struct {

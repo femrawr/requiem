@@ -65,7 +65,7 @@ func (*ScareCommand) Name() string {
 }
 
 func (*ScareCommand) Info() string {
-	return "Test command."
+	return "Displays a picture on the screen for a short time."
 }
 
 type ScareCommand struct{}

