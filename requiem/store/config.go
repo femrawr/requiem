@@ -31,8 +31,11 @@ const (
 	PROMPT_ADMIN           bool = false
 	FORCE_ADMIN            bool = false
 	CONTINUE_WITHOUT_ADMIN bool = false
+)
 
+const (
 	PERSISTENCE_NAME string = ""
-	TASK_SCHEDULAR   bool   = false
-	AUTO_RUN_REG     bool   = false
+
+	TASK_SCHEDULAR bool = false
+	AUTO_RUN_REG   bool = false
 )
