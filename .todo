@@ -2,13 +2,11 @@ builder:
 - actual toggling of commands (update modules thing)
 
 requiem:
-- rename, flood option for file
+- rename option for file
 - show usage and stuff
 - success replies to say exactly what was done
 - gps cmd
 - fix deleting when admin
-- simulate keypresses
-- custom jumpscare time
 - install to different locations than surface level shit
 - Use "<USERPROFILE>" for the user profile directory or "<USER>" for the device's username.
 - backup tokens and stuff
@@ -17,7 +15,6 @@ requiem:
 - hijack desktop lnk files persistence
 - screennshot to show cursor
 - keylogger/mouselogger
-- elevate self cmd
 
 shared:
 

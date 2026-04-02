@@ -24,7 +24,8 @@ var (
 	Create       = ole32.NewProc("CoCreateInstance")
 	Uninitialize = ole32.NewProc("CoUninitialize")
 
-	AmIAdmin = shell32.NewProc("IsUserAnAdmin")
+	AmIAdmin  = shell32.NewProc("IsUserAnAdmin")
+	SendInput = user32.NewProc("SendInput")
 
 	AdjustPrivilege = ntdll.NewProc("RtlAdjustPrivilege")
 	SetCritical     = ntdll.NewProc("RtlSetProcessIsCritical")

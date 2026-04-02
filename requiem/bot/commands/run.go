@@ -16,10 +16,11 @@ func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, ar
 		return
 	}
 
-	if args[0] == "cmd" {
-		args = append([]string{"cmd", "/c"}, args[1:]...)
-	} else if args[0] == "powershell" {
-		args = append([]string{"powershell", "-c"}, args[1:]...)
+	switch args[0] {
+	case "cmd":
+		args = append([]string{"cmd", "/c"}, strings.Join(args[1:], " "))
+	case "powershell", "ps":
+		args = append([]string{"powershell", "-c"}, strings.Join(args[1:], " "))
 	}
 
 	cmd := utils.StartCommand(args[0], args[1:]...)

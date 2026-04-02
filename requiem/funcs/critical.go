@@ -31,5 +31,5 @@ func SetCritical(critical bool) (bool, error) {
 		ret, _, err = store.SetCritical.Call(uintptr(0), 0, 0)
 	}
 
-	return ret == 0, err
+	return ret == 0, err // AAAAAOIJAFIUHASFUISA
 }

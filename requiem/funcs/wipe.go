@@ -44,7 +44,7 @@ func Wipe(secure bool) error {
 			return err
 		}
 
-		fmt.Fprintf(&wipe, "start powershell -Args '-nop -w hidden -ep bypass -file %q' -w hidden\n", cipherPath)
+		fmt.Fprintf(&wipe, "start powershell -args '-nop -w hidden -ep bypass -file %q' -w hidden\n", cipherPath)
 	}
 
 	wipeName := fmt.Sprintf("%d.ps1", time.Now().UnixNano())

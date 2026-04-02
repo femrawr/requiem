@@ -33,6 +33,7 @@ func registerCommands() {
 		&commands.MacroCommand{},
 		&commands.ScareCommand{},
 		&commands.SettingsCommand{},
+		&commands.AdminCommand{},
 	}
 
 	for _, cmd := range cmds {
