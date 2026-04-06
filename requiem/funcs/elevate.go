@@ -9,10 +9,9 @@ import (
 )
 
 func AttempElevate() bool {
-	err := utils.RunCommand("powershell", "-c",
-		fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
-	)
+	command := fmt.Sprintf("start \"%s\" -verb runas", store.ExecPath)
 
+	err := utils.RunCommand("powershell", "-c", command)
 	if err != nil {
 		return false
 	}
@@ -21,12 +20,11 @@ func AttempElevate() bool {
 }
 
 func ElevateWithConfig() {
+	command := fmt.Sprintf("start \"%s\" -verb runas", store.ExecPath)
+
 	if store.FORCE_ADMIN {
 		for {
-			err := utils.RunCommand("powershell", "-c",
-				fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
-			)
-
+			err := utils.RunCommand("powershell", "-c", command)
 			if err != nil {
 				continue
 			}
@@ -36,10 +34,7 @@ func ElevateWithConfig() {
 	}
 
 	if store.PROMPT_ADMIN {
-		err := utils.RunCommand("powershell", "-c",
-			fmt.Sprintf(`start "%s" -verb runas`, store.ExecPath),
-		)
-
+		err := utils.RunCommand("powershell", "-c", command)
 		if err != nil && !store.CONTINUE_WITHOUT_ADMIN {
 			os.Exit(0)
 		}

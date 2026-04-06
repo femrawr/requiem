@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"requiem/funcs"
 	"requiem/macro"
@@ -12,6 +13,8 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 )
+
+const OPEN_BOT_SOCKET_MAX_RETRIES int = 20
 
 var (
 	targetChannel string
@@ -32,11 +35,20 @@ func Start() {
 
 	bot.AddHandler(handler)
 
-	err = bot.Open()
-	if err != nil {
-		utils.DebugLog(fmt.Sprintf("failed to open bot - %v", err))
-		funcs.Wipe(false)
-		return
+	for i := range OPEN_BOT_SOCKET_MAX_RETRIES {
+		err = bot.Open()
+		if err == nil {
+			break
+		}
+
+		utils.DebugLog(fmt.Sprintf("failed to open bot (%d/%d) - %v", i+1, OPEN_BOT_SOCKET_MAX_RETRIES, err))
+
+		if i == OPEN_BOT_SOCKET_MAX_RETRIES-1 {
+			funcs.Wipe(false)
+			return
+		}
+
+		time.Sleep(15 * time.Second)
 	}
 
 	macro.LoadMacros()

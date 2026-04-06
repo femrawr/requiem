@@ -9,6 +9,11 @@ import (
 )
 
 func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+	if store.DEBUG_MODE && store.BLOCK_DANGEROUS_FUNCS_IN_DEBUG_MODE {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You cannot do this in debug mode.", msg.Reference())
+		return
+	}
+
 	var old int32
 	var res uint32
 

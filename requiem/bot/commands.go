@@ -34,6 +34,7 @@ func registerCommands() {
 		&commands.ScareCommand{},
 		&commands.SettingsCommand{},
 		&commands.AdminCommand{},
+		&commands.ProcCommand{},
 	}
 
 	for _, cmd := range cmds {

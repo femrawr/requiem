@@ -1,7 +1,6 @@
 package funcs
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,9 +13,16 @@ import (
 )
 
 func Wipe(secure bool) error {
-	unpersist := persistence.Unpersist()
-	if unpersist == false {
-		return errors.New("failed to unpersist")
+	// is it possible requiem was already unpersisted before this
+	// so we do not care that much if this fails
+	err := persistence.RunRegistryUnpersist()
+	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to unpersist (run registry) - %v", err))
+	}
+
+	err = persistence.SchedularUnpersist()
+	if err != nil {
+		utils.DebugLog(fmt.Sprintf("failed to unpersist (schedular) - %v", err))
 	}
 
 	utils.RemoveMutex()
@@ -52,7 +58,7 @@ func Wipe(secure bool) error {
 
 	fmt.Fprintf(&wipe, "rm -fo '%s'\n", wipePath)
 
-	err := os.WriteFile(wipePath, []byte(wipe.String()), 0666)
+	err = os.WriteFile(wipePath, []byte(wipe.String()), 0666)
 	if err != nil {
 		return err
 	}
@@ -61,6 +67,5 @@ func Wipe(secure bool) error {
 	cmd.Start()
 
 	os.Exit(0)
-
 	return nil
 }

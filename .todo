@@ -15,6 +15,10 @@ requiem:
 - hijack desktop lnk files persistence
 - screennshot to show cursor
 - keylogger/mouselogger
+- loop symbol for macros
+- make wipe use ps1
+- fix crashing with uac cmd
+- make uac cmd use win reg pkg
 
 shared:
 

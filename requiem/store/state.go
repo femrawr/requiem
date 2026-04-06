@@ -3,17 +3,17 @@ package store
 import "os"
 
 var (
-	DecryptedServerID string
-
-	DecryptedPersistenceName string
-)
-
-var (
 	IsAdmin bool
 
 	ExecPath string
 
 	HomePath string
+)
+
+var (
+	DecryptedServerID string
+
+	DecryptedPersistenceName string
 )
 
 func InitState() {

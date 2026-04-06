@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
@@ -13,6 +14,11 @@ import (
 func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
 	if len(args) < 1 {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a program to run.", msg.Reference())
+		return
+	}
+
+	if len(args) >= 2 && strings.ContainsAny(strings.ToLower(args[1]), "shutdown") && store.DEBUG_MODE && store.BLOCK_DANGEROUS_FUNCS_IN_DEBUG_MODE {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You cannot do this in debug mode.", msg.Reference())
 		return
 	}
 

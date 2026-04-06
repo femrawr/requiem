@@ -7,12 +7,18 @@ import (
 )
 
 func (*PersistCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	persisted := persistence.Persist("")
-	if persisted {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully persisted.", msg.Reference())
-	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to persist.", msg.Reference())
+	err := persistence.RunRegistryPersist("", true)
+	if err != nil {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to persist (run registry).", msg.Reference())
 	}
+
+	err = persistence.SchedularPersist("", true)
+	if err != nil {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to persist (schedular).", msg.Reference())
+		return
+	}
+
+	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully persisted.", msg.Reference())
 }
 
 func (*PersistCommand) Name() string {
@@ -20,7 +26,7 @@ func (*PersistCommand) Name() string {
 }
 
 func (*PersistCommand) Info() string {
-	return "Re-persists Requiem if it was disabled."
+	return "Persists or re-persists Requiem if it was disabled."
 }
 
 type PersistCommand struct{}
