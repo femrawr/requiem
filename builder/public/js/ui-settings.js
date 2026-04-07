@@ -99,7 +99,7 @@ const createDropdown = (config) => {
     select.id = config.id || id;
 
     if (config.items && Array.isArray(config.items)) {
-        config.items.forEach(item => {
+        config.items.forEach((item) => {
             const option = document.createElement('option');
             option.value = item;
             option.textContent = item;
@@ -108,6 +108,72 @@ const createDropdown = (config) => {
     }
 
     container.appendChild(select);
+
+    box.appendChild(title);
+    box.appendChild(desc);
+    box.appendChild(container);
+
+    return box;
+};
+
+const createSlider = (config) => {
+    const box = document.createElement('div');
+    box.className = 'box';
+
+    const title = document.createElement('div');
+    title.className = 'title';
+
+    const id = config.name.toLowerCase().replaceAll(' ', '_');
+
+    const label = document.createElement('label');
+    label.innerHTML = `<strong>${config.name}</strong>`;
+
+    const value = document.createElement('input');
+    value.className = 'value-input';
+    value.type = 'number';
+    value.id = config.id || id;
+    value.value = config.value ?? config.min ?? 0;
+
+    value.addEventListener('blur', () => {
+        const val = parseFloat(value.value);
+        if (!isNaN(val)) return;
+
+        const theDefault = config.value ?? config.min ?? 0;
+        value.value = theDefault;
+        slider.value = theDefault;
+    });
+
+    value.addEventListener('input', () => {
+        const val = parseFloat(value.value);
+        if (isNaN(val)) return;
+
+        value.value = Math.min(val, config.max ?? 100);
+        slider.value = value.value;
+    });
+
+    title.appendChild(label);
+    title.appendChild(value);
+
+    const desc = document.createElement('div');
+    desc.className = 'desc';
+    desc.textContent = config.info;
+
+    const container = document.createElement('div');
+    container.className = 'input-container';
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.className = 'input';
+    slider.id = config.id || id;
+    slider.min = config.min ?? 0;
+    slider.max = config.max ?? 100;
+    slider.value = config.value ?? config.min ?? 0;
+
+    slider.addEventListener('input', () => {
+        value.value = slider.value;
+    });
+
+    container.appendChild(slider);
 
     box.appendChild(title);
     box.appendChild(desc);
@@ -133,6 +199,9 @@ const createSetting = (config) => {
 
         case 'text':
             return createTextbox(config);
+
+        case 'slider':
+            return createSlider(config);
 
         case 'list':
             return createDropdown(config);

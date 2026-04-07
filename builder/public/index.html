@@ -46,6 +46,13 @@
     <script>
         const TAG_NAME = 'req.tag';
         const CFG_NAME = 'req.cfg';
+
+        (async () => {
+            const fetched = await fetch('/api/get-version');
+            const versions = await fetched.json();
+
+            document.title += ' ' + versions.public + '.' + versions.server
+        })();
     </script>
 
     <script src="js/ui-settings.js"></script>

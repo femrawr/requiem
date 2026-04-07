@@ -4,4 +4,5 @@ func RegisterRoutes() {
 	getCommands()
 	startBuild()
 	updateConfig()
+	getVersion()
 }

@@ -78,6 +78,30 @@
             "name": "Continue without admin",
             "info": "If the user declines the Account Control prompt while \"Require admin\" is enabled, Requiem will still run.",
             "type": "checkbox"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Connect bot max retries",
+            "info": "The number of retries to connect the bot before Requiem exits or wipes itself.",
+            "type": "slider",
+            "value": 20,
+            "min": 1,
+            "max": 50
+        },
+        {
+            "name": "Connect bot retry delay",
+            "info": "How long to wait in seconds before retring to connect the bot again.",
+            "type": "slider",
+            "value": 15,
+            "min": 1,
+            "max": 100
+        },
+        {
+            "name": "Exit if cannot connect",
+            "info": "If the bot still could not connect after the retries, it will exit instead of wiping itself.",
+            "type": "checkbox"
         }
     ],
     "persistence": [

@@ -26,3 +26,14 @@ func ReplaceBool(text *string, name string, value bool) {
 		`%s bool = %t`, name, value,
 	))
 }
+
+func ReplaceInt(text *string, name string, value int) {
+	re := regexp.MustCompile(fmt.Sprintf(
+		`%s\s+int\s*=\s*\d+`,
+		regexp.QuoteMeta(name),
+	))
+
+	*text = re.ReplaceAllString(*text, fmt.Sprintf(
+		`%s bool = %d`, name, value,
+	))
+}

