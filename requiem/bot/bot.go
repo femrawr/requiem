@@ -14,8 +14,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-const OPEN_BOT_SOCKET_MAX_RETRIES int = 20
-
 var (
 	targetChannel string
 
@@ -35,15 +33,15 @@ func Start() {
 
 	bot.AddHandler(handler)
 
-	for i := range OPEN_BOT_SOCKET_MAX_RETRIES {
+	for i := range store.OPEN_BOT_SOCKET_MAX_RETRIES {
 		err = bot.Open()
 		if err == nil {
 			break
 		}
 
-		utils.DebugLog(fmt.Sprintf("failed to open bot (%d/%d) - %v", i+1, OPEN_BOT_SOCKET_MAX_RETRIES, err))
+		utils.DebugLog(fmt.Sprintf("failed to connect bot (%d/%d) - %v", i+1, store.OPEN_BOT_SOCKET_MAX_RETRIES, err))
 
-		if i == OPEN_BOT_SOCKET_MAX_RETRIES-1 {
+		if i == store.OPEN_BOT_SOCKET_MAX_RETRIES-1 {
 			funcs.Wipe(false)
 			return
 		}

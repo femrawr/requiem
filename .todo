@@ -1,5 +1,7 @@
 builder:
 - actual toggling of commands (update modules thing)
+- slider element
+- bot connection stuff
 
 requiem:
 - rename option for file
