@@ -105,7 +105,7 @@ func (*MacroCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 			macros.WriteString(name + "\n")
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("Macros:\n```\n%s```", macros.String()), msg.Reference())
+		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("Macros:\n```\n%s\n```", macros.String()), msg.Reference())
 		return
 	}
 

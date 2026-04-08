@@ -35,7 +35,7 @@ func (*WipeCommand) Name() string {
 }
 
 func (*WipeCommand) Info() string {
-	return "Removes Requiem from the device."
+	return "Removes this from the device."
 }
 
 type WipeCommand struct{}

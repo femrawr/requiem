@@ -21,7 +21,7 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	if utils.HasFlag(content, "mute") {
 		err := funcs.SetMuted(true)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to mute.", msg.Reference())
+			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to mute - %s", err), msg.Reference())
 			return
 		}
 
@@ -32,7 +32,7 @@ func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	if utils.HasFlag(content, "unmute") {
 		err := funcs.SetMuted(false)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to unmute.", msg.Reference())
+			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to unmute - %s", err), msg.Reference())
 			return
 		}
 

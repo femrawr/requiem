@@ -37,7 +37,7 @@ func (*CriticalCommand) Name() string {
 }
 
 func (*CriticalCommand) Info() string {
-	return "Makes Requiem a critical process."
+	return "Makes this a critical process."
 }
 
 type CriticalCommand struct{}

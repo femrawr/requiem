@@ -20,8 +20,10 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	content := strings.Join(args, " ")
 
+	list := utils.HasFlag(content, "list")
+
 	site := utils.UnwrapQuotes(content)
-	if site == "" {
+	if site == "" && !list {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the website in double quotes.", msg.Reference())
 		return
 	}
@@ -95,7 +97,7 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		return
 	}
 
-	if utils.HasFlag(content, "list") {
+	if list {
 		data, err := os.ReadFile(path)
 		if err != nil {
 			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read file - %s", err), msg.Reference())

@@ -1,9 +1,8 @@
 package store
 
 const (
-	VERSION_MAJOR int = 3
-	VERSION_MINOR int = 13
-	VERSION_PATCH int = 2
+	VERSION_UPDATE int = 14
+	VERSION_PATCH  int = 2
 )
 
 const (

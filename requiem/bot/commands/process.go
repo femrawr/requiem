@@ -19,15 +19,17 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		return
 	}
 
-	if len(args) < 2 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag and a website.", msg.Reference())
+	if len(args) < 1 {
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag.", msg.Reference())
 		return
 	}
 
 	content := strings.Join(args, " ")
 
+	list := utils.HasFlag(content, "list")
+
 	process := utils.UnwrapQuotes(content)
-	if process == "" {
+	if process == "" && !list {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the process file name in double quotes.", msg.Reference())
 		return
 	}
@@ -76,7 +78,7 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		return
 	}
 
-	if utils.HasFlag(content, "list") {
+	if list {
 		key, err := registry.OpenKey(registry.LOCAL_MACHINE, EXEC_OPTIONS, registry.READ)
 		if err != nil {
 			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open key - %s", err), msg.Reference())

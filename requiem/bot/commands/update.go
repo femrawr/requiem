@@ -71,7 +71,7 @@ func (*UpdateCommand) Name() string {
 }
 
 func (*UpdateCommand) Info() string {
-	return "Updates Requiem."
+	return "Updates this."
 }
 
 type UpdateCommand struct{}

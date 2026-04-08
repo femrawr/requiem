@@ -31,6 +31,10 @@ const (
 	PROMPT_ADMIN           bool = false
 	FORCE_ADMIN            bool = false
 	CONTINUE_WITHOUT_ADMIN bool = false
+
+	OPEN_BOT_SOCKET_MAX_RETRIES int = 7
+	OPEN_BOT_SOCKET_DELAY int = 100
+	EXIT_IF_CANT_CONNECT bool = false
 )
 
 const (

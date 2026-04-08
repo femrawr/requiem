@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -17,8 +18,9 @@ import (
 var (
 	targetChannel string
 
-	lastCommand   string
-	lastArguments []string
+	lastMessageContext *discordgo.MessageCreate
+	lastCommand        string
+	lastArguments      []string
 )
 
 func Start() {
@@ -42,7 +44,12 @@ func Start() {
 		utils.DebugLog(fmt.Sprintf("failed to connect bot (%d/%d) - %v", i+1, store.OPEN_BOT_SOCKET_MAX_RETRIES, err))
 
 		if i == store.OPEN_BOT_SOCKET_MAX_RETRIES-1 {
-			funcs.Wipe(false)
+			if store.EXIT_IF_CANT_CONNECT {
+				os.Exit(0)
+			} else {
+				funcs.Wipe(false)
+			}
+
 			return
 		}
 
@@ -106,13 +113,13 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 				if err := recover(); err != nil {
 					ses.ChannelMessageSendReply(
 						msg.ChannelID,
-						fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
+						fmt.Sprintf("⚠️ FATAL ERROR - %v", err),
 						msg.Reference(),
 					)
 				}
 			}()
 
-			commandsList[lastCommand].Exec(ses, msg, lastArguments)
+			commandsList[lastCommand].Exec(ses, lastMessageContext, lastArguments)
 		}()
 
 		return
@@ -162,6 +169,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
+	lastMessageContext = msg
 	lastCommand = name
 	lastArguments = args
 
@@ -170,7 +178,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 			if err := recover(); err != nil {
 				ses.ChannelMessageSendReply(
 					msg.ChannelID,
-					fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
+					fmt.Sprintf("⚠️ FATAL ERROR - %v", err),
 					msg.Reference(),
 				)
 			}

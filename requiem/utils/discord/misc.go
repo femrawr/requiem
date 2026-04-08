@@ -17,9 +17,9 @@ func GetConnectionMsg(new bool) string {
 		mention = "@everyone"
 	}
 
-	message := "Requiem has reconnected."
+	message := "This device has reconnected."
 	if new {
-		message = "Requiem has connected to a new device."
+		message = "A new device has been connected."
 	}
 
 	trackingID := ""
@@ -28,9 +28,8 @@ func GetConnectionMsg(new bool) string {
 	}
 
 	version := fmt.Sprintf(
-		"[%d.%d.%d%s]",
-		store.VERSION_MAJOR,
-		store.VERSION_MINOR,
+		"[%d.%d%s]",
+		store.VERSION_UPDATE,
 		store.VERSION_PATCH,
 		trackingID,
 	)
