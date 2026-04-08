@@ -121,5 +121,17 @@
             "type": "checkbox",
             "value": "true"
         }
+    ],
+    "build": [
+        {
+            "name": "Obfuscate build",
+            "info": "Obfuscates the build with Garble.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Pack build",
+            "info": "Packs the build with UPX.",
+            "type": "checkbox"
+        }
     ]
 }

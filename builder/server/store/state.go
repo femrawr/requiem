@@ -21,6 +21,9 @@ var (
 
 	// the build tag, it is set in /routes/update_config.go
 	Tag string = "none"
+
+	Obfuscate bool = false
+	Pack      bool = false
 )
 
 func InitState() {
