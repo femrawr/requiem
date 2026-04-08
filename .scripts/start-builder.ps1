@@ -1,17 +1,17 @@
-$origin = gl
+$origin = Get-Location
 
 try {
-    if ((gl).Path -like "*.scripts*") {
-        cd ..\
+    if ((Get-Location).Path -like "*.scripts*") {
+        Set-Location ..\
     }
 
-    cd .\builder\
-    cd .\server\
+    Set-Location .\builder\
+    Set-Location .\server\
 
     go build -trimpath -buildvcs=false -ldflags="-s -w -buildid=" -o .\builder.exe
 
     .\builder.exe
 }
 finally {
-    cd $origin
+    Set-Location $origin
 }

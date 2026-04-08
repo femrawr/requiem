@@ -1,7 +1,6 @@
 builder:
 - actual toggling of commands (update modules thing)
-- slider element
-- bot connection stuff
+- detect and remove upx version
 
 requiem:
 - rename option for file
@@ -21,8 +20,11 @@ requiem:
 - make wipe use ps1
 - fix crashing with uac cmd
 - make uac cmd use win reg pkg
+- debug command
+- run multiple commands at once
 
 shared:
 
 wiki:
 - add visuals
+- warning for garble and upx (needs to be added to PATH)
