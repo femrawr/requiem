@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -38,4 +39,29 @@ func HasFlag(text string, flag string) bool {
 	}
 
 	return false
+}
+
+func ParsePath(path string) string {
+	result := regexp.MustCompile("%([^%]+)%").ReplaceAllStringFunc(path, func(match string) string {
+		key := match[1 : len(match)-1]
+
+		val := os.Getenv(key)
+		if val != "" {
+			return val
+		}
+
+		return match
+	})
+
+	return result
+}
+
+func CleanPath(path string) string {
+	return strings.Map(func(rune rune) rune {
+		if strings.ContainsRune("\\/:*?\"<>|", rune) {
+			return -1
+		}
+
+		return rune
+	}, path)
 }

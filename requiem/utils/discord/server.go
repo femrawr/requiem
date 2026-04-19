@@ -11,10 +11,10 @@ import (
 
 const DEFAULT_CATEGORY_NAME string = "string2"
 
-func FindCategory(ses *discordgo.Session) string {
+func FindCategory(ses *discordgo.Session) (string, error) {
 	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	for _, channel := range channels {
@@ -26,7 +26,7 @@ func FindCategory(ses *discordgo.Session) string {
 			continue
 		}
 
-		return channel.ID
+		return channel.ID, nil
 	}
 
 	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
@@ -35,20 +35,23 @@ func FindCategory(ses *discordgo.Session) string {
 	})
 
 	if err != nil {
-		return ""
+		return "", err
 	}
 
-	return channel.ID
+	return channel.ID, nil
 }
 
 // the 2nd return is if the channel was newly created
-func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
+func FindChannel(ses *discordgo.Session, categoryID string) (string, bool, error) {
 	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
-		return "", false
+		return "", false, err
 	}
 
-	fingerprint := funcs.GenFingerprint()
+	fingerprint, err := funcs.GenFingerprint()
+	if err != nil {
+		return "", false, err
+	}
 
 	for _, channel := range channels {
 		if channel.Topic != fingerprint {
@@ -63,7 +66,7 @@ func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 			continue
 		}
 
-		return channel.ID, false
+		return channel.ID, false, nil
 	}
 
 	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
@@ -74,8 +77,8 @@ func FindChannel(ses *discordgo.Session, categoryID string) (string, bool) {
 	})
 
 	if err != nil {
-		return "", false
+		return "", false, err
 	}
 
-	return channel.ID, true
+	return channel.ID, true, nil
 }

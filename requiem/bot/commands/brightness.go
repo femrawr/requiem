@@ -2,9 +2,10 @@ package commands
 
 import (
 	"fmt"
-	"requiem/utils"
 	"strconv"
 	"strings"
+
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )

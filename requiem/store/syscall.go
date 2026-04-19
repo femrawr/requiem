@@ -8,6 +8,9 @@ var (
 	ole32    = syscall.NewLazyDLL("ole32.dll")
 	shell32  = syscall.NewLazyDLL("shell32.dll")
 	ntdll    = syscall.NewLazyDLL("ntdll.dll")
+	mfplat   = syscall.NewLazyDLL("mfplat.dll")
+	mf       = syscall.NewLazyDLL("mf.dll")
+	mfrw     = syscall.NewLazyDLL("mfreadwrite.dll")
 )
 
 var (
@@ -20,9 +23,9 @@ var (
 	MessageBox    = user32.NewProc("MessageBoxW")
 	BlockInput    = user32.NewProc("BlockInput")
 
-	Initialize   = ole32.NewProc("CoInitialize")
-	Create       = ole32.NewProc("CoCreateInstance")
-	Uninitialize = ole32.NewProc("CoUninitialize")
+	InitializeCOM   = ole32.NewProc("CoInitialize")
+	UninitializeCOM = ole32.NewProc("CoUninitialize")
+	CreateCOM       = ole32.NewProc("CoCreateInstance")
 
 	AmIAdmin  = shell32.NewProc("IsUserAnAdmin")
 	SendInput = user32.NewProc("SendInput")
@@ -30,4 +33,13 @@ var (
 	AdjustPrivilege = ntdll.NewProc("RtlAdjustPrivilege")
 	SetCritical     = ntdll.NewProc("RtlSetProcessIsCritical")
 	RaiseHardError  = ntdll.NewProc("NtRaiseHardError")
+
+	MediaStartup          = mfplat.NewProc("MFStartup")
+	MediaShutdown         = mfplat.NewProc("MFShutdown")
+	MediaCreateAttributes = mfplat.NewProc("MFCreateAttributes")
+	MediaCreateType       = mfplat.NewProc("MFCreateMediaType")
+
+	MediaEnumerateDevices = mf.NewProc("MFEnumDeviceSources")
+
+	MediaCreateReader = mfrw.NewProc("MFCreateSourceReaderFromMediaSource")
 )

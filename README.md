@@ -1,7 +1,17 @@
-# requiem
+# Requiem
 A super customizable remote administration tool controllable via a Discord bot.
 
 Check out the Wiki for more info: https://github.com/femrawr/requiem/wiki
+
+## Features
+- Take pictures of the desktop
+- Adjust display settings
+- Various file related utilities
+- Self updating
+- Macro system
+- Runtime settings system
+
+And much more!
 
 ## Legal disclaimer
 Requiem is strictly for educational purposes only and should not be used in any malicious way. Requiem is a cyber security research project for a class and proof-of-concept project to show how a remote tool can be used with [discordgo](https://github.com/bwmarrin/discordgo). <br>

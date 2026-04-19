@@ -5,11 +5,11 @@ import (
 	"os"
 )
 
-const CONFIG_ADS_NAME string = "c"
+const _CONFIG_ADS_NAME string = "c"
 
-var RuntimeSettings Settings
+var RuntimeSettings runtimeSettings
 
-type Settings struct {
+type runtimeSettings struct {
 	AudioDisableInputsUntilFinished bool `json:"audio_disable_inputs_until_finished"`
 	AudioUnmuteBeforePlay           bool `json:"audio_unmute_before_play"`
 	AudioMaxVolumeBeforePlay        bool `json:"audio_max_volume_before_play"`
@@ -19,10 +19,10 @@ type Settings struct {
 }
 
 func LoadSettings() error {
-	data, err := os.ReadFile(ExecPath + ":" + CONFIG_ADS_NAME)
+	data, err := os.ReadFile(ExecPath + ":" + _CONFIG_ADS_NAME)
 	if err != nil {
 		if os.IsNotExist(err) {
-			RuntimeSettings = Settings{}
+			RuntimeSettings = runtimeSettings{}
 			return nil
 		}
 
@@ -38,10 +38,10 @@ func SaveSettings() error {
 		return err
 	}
 
-	return os.WriteFile(ExecPath+":"+CONFIG_ADS_NAME, data, 0666)
+	return os.WriteFile(ExecPath+":"+_CONFIG_ADS_NAME, data, 0666)
 }
 
-func SetSettings(fn func(*Settings)) error {
+func SetSettings(fn func(*runtimeSettings)) error {
 	fn(&RuntimeSettings)
 	return SaveSettings()
 }

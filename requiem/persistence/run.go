@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	START_ALLOWED string = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run"
-	AUTO_START    string = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+	_START_ALLOWED string = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StartupApproved\\Run"
+	_AUTO_START    string = "Software\\Microsoft\\Windows\\CurrentVersion\\Run"
 )
 
 func RunRegistryPersist(filePath string, overrideConfig bool) error {
@@ -18,13 +18,13 @@ func RunRegistryPersist(filePath string, overrideConfig bool) error {
 		return nil
 	}
 
-	key, err := registry.OpenKey(registry.CURRENT_USER, START_ALLOWED, registry.SET_VALUE)
+	key, err := registry.OpenKey(registry.CURRENT_USER, _START_ALLOWED, registry.SET_VALUE)
 	if err == nil {
 		key.DeleteValue(store.DecryptedPersistenceName)
 		key.Close()
 	}
 
-	key, err = registry.OpenKey(registry.CURRENT_USER, AUTO_START, registry.SET_VALUE)
+	key, err = registry.OpenKey(registry.CURRENT_USER, _AUTO_START, registry.SET_VALUE)
 	if err != nil {
 		return err
 	}
@@ -50,13 +50,13 @@ func RunRegistryPersist(filePath string, overrideConfig bool) error {
 }
 
 func RunRegistryUnpersist() error {
-	key, err := registry.OpenKey(registry.CURRENT_USER, START_ALLOWED, registry.SET_VALUE)
+	key, err := registry.OpenKey(registry.CURRENT_USER, _START_ALLOWED, registry.SET_VALUE)
 	if err == nil {
 		key.DeleteValue(store.DecryptedPersistenceName)
 		key.Close()
 	}
 
-	key, err = registry.OpenKey(registry.CURRENT_USER, AUTO_START, registry.SET_VALUE)
+	key, err = registry.OpenKey(registry.CURRENT_USER, _AUTO_START, registry.SET_VALUE)
 	if err != nil {
 		return err
 	}

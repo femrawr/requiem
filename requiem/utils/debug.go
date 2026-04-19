@@ -7,7 +7,7 @@ import (
 	"requiem/store"
 )
 
-const LOG_FILE_NAME string = "requiem debug.txt"
+const _LOG_FILE_NAME string = "requiem debug.txt"
 
 var logFilePath string = ""
 
@@ -36,6 +36,6 @@ func getLogFilePath() string {
 		return logFilePath
 	}
 
-	logFilePath = path.Join(store.HomePath, "Desktop", LOG_FILE_NAME)
+	logFilePath = path.Join(store.HomePath, "Desktop", _LOG_FILE_NAME)
 	return logFilePath
 }

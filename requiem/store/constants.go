@@ -1,7 +1,7 @@
 package store
 
 const (
-	VERSION_UPDATE int = 14
+	VERSION_UPDATE int = 15
 	VERSION_PATCH  int = 2
 )
 

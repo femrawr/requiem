@@ -3,7 +3,7 @@ package macro
 import "strings"
 
 const (
-	MACRO_FILE_HEADER string = "RMF"
+	_MACRO_FILE_HEADER string = "RMF"
 )
 
 var symbols = map[string]string{
@@ -11,7 +11,7 @@ var symbols = map[string]string{
 	"WAIT": "1",
 }
 
-type Line struct {
+type macroDataLine struct {
 	Line   string
 	Symbol string
 	ID     string
@@ -19,11 +19,11 @@ type Line struct {
 	Args   []string
 }
 
-type Macro struct {
-	Lines []Line
+type macroData struct {
+	Lines []macroDataLine
 }
 
-func (line Line) Encode() string {
+func (line macroDataLine) Encode() string {
 	encoded := line.ID + "." + line.Value
 
 	if len(line.Args) > 0 {
@@ -33,7 +33,7 @@ func (line Line) Encode() string {
 	return encoded
 }
 
-func (macro Macro) Encode() string {
+func (macro macroData) Encode() string {
 	parts := make([]string, len(macro.Lines))
 
 	for i, line := range macro.Lines {

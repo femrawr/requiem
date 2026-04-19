@@ -31,7 +31,7 @@ var (
 	}
 )
 
-type deviceEnumerator struct {
+type deviceEnumeratorTable struct {
 	QueryInterface                         uintptr
 	AddRef                                 uintptr
 	Release                                uintptr
@@ -42,7 +42,15 @@ type deviceEnumerator struct {
 	UnregisterEndpointNotificationCallback uintptr
 }
 
-type device struct {
+type deviceEnumerator struct {
+	Table *deviceEnumeratorTable
+}
+
+func (a *deviceEnumerator) release() {
+	syscall.SyscallN(a.Table.Release, uintptr(unsafe.Pointer(a)))
+}
+
+type deviceTable struct {
 	QueryInterface    uintptr
 	AddRef            uintptr
 	Release           uintptr
@@ -52,7 +60,15 @@ type device struct {
 	GetState          uintptr
 }
 
-type endpointVolume struct {
+type device struct {
+	Table *deviceTable
+}
+
+func (a *device) release() {
+	syscall.SyscallN(a.Table.Release, uintptr(unsafe.Pointer(a)))
+}
+
+type endpointVolumeTable struct {
 	QueryInterface                uintptr
 	AddRef                        uintptr
 	Release                       uintptr
@@ -71,28 +87,12 @@ type endpointVolume struct {
 	GetMute                       uintptr
 }
 
-type deviceEnumeratorStruct struct {
-	Table *deviceEnumerator
+type endpointVolume struct {
+	Table *endpointVolumeTable
 }
 
-type deviceStruct struct {
-	Table *device
-}
-
-type endpointVolumeStruct struct {
-	Table *endpointVolume
-}
-
-func (v *deviceEnumeratorStruct) release() {
-	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
-}
-
-func (v *deviceStruct) release() {
-	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
-}
-
-func (v *endpointVolumeStruct) release() {
-	syscall.SyscallN(v.Table.Release, uintptr(unsafe.Pointer(v)))
+func (a *endpointVolume) release() {
+	syscall.SyscallN(a.Table.Release, uintptr(unsafe.Pointer(a)))
 }
 
 func SetMuted(mute bool) error {
@@ -101,9 +101,9 @@ func SetMuted(mute bool) error {
 		return err
 	}
 
-	defer store.Uninitialize.Call()
+	defer store.UninitializeCOM.Call()
 
-	enumerator, device, endpoint, err := getDeviceEndpoint()
+	enumerator, device, endpoint, err := getDevices()
 	if err != nil {
 		return err
 	}
@@ -137,9 +137,9 @@ func GetMuted() (bool, error) {
 		return false, err
 	}
 
-	defer store.Uninitialize.Call()
+	defer store.UninitializeCOM.Call()
 
-	enumerator, device, endpoint, err := getDeviceEndpoint()
+	enumerator, device, endpoint, err := getDevices()
 	if err != nil {
 		return false, err
 	}
@@ -168,9 +168,9 @@ func SetVolume(volume float32) error {
 		return err
 	}
 
-	defer store.Uninitialize.Call()
+	defer store.UninitializeCOM.Call()
 
-	enumerator, device, endpoint, err := getDeviceEndpoint()
+	enumerator, device, endpoint, err := getDevices()
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func SetVolume(volume float32) error {
 }
 
 func checkInit() error {
-	res, _, err := store.Initialize.Call(0)
+	res, _, err := store.InitializeCOM.Call(0)
 	if res != 0 && res != 0x80010106 {
 		return err
 	}
@@ -202,9 +202,9 @@ func checkInit() error {
 	return nil
 }
 
-func getDeviceEndpoint() (*deviceEnumeratorStruct, *deviceStruct, *endpointVolumeStruct, error) {
-	var enumerator *deviceEnumeratorStruct
-	res, _, err := store.Create.Call(
+func getDevices() (*deviceEnumerator, *device, *endpointVolume, error) {
+	var enumerator *deviceEnumerator
+	res, _, err := store.CreateCOM.Call(
 		uintptr(unsafe.Pointer(&mmDeviceEnumerator)),
 		0,
 		23,
@@ -216,7 +216,7 @@ func getDeviceEndpoint() (*deviceEnumeratorStruct, *deviceStruct, *endpointVolum
 		return nil, nil, nil, err
 	}
 
-	var device *deviceStruct
+	var device *device
 	res, _, err = syscall.SyscallN(
 		enumerator.Table.GetDefaultAudioEndpoint,
 		uintptr(unsafe.Pointer(enumerator)),
@@ -230,7 +230,7 @@ func getDeviceEndpoint() (*deviceEnumeratorStruct, *deviceStruct, *endpointVolum
 		return nil, nil, nil, err
 	}
 
-	var endpoint *endpointVolumeStruct
+	var endpoint *endpointVolume
 	res, _, err = syscall.SyscallN(
 		device.Table.Activate,
 		uintptr(unsafe.Pointer(device)),

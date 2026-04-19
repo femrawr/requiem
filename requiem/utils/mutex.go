@@ -9,7 +9,12 @@ import (
 	"requiem/store"
 )
 
-var MutexFile *os.File
+const (
+	_LOCKFILE_EXCLUSIVE_LOCK   uintptr = 0x00000002
+	_LOCKFILE_FAIL_IMMEDIATELY uintptr = 0x00000001
+)
+
+var mutexFile *os.File
 
 func CheckMutex() bool {
 	path := filepath.Join(os.TempDir(), store.MUTEX_NAME)
@@ -19,7 +24,7 @@ func CheckMutex() bool {
 		return false
 	}
 
-	MutexFile = file
+	mutexFile = file
 
 	err = lockMutex()
 	if err != nil {
@@ -31,21 +36,21 @@ func CheckMutex() bool {
 }
 
 func RemoveMutex() {
-	if MutexFile == nil {
+	if mutexFile == nil {
 		return
 	}
 
 	unlockMutex()
-	MutexFile.Close()
+	mutexFile.Close()
 
-	os.Remove(MutexFile.Name())
+	os.Remove(mutexFile.Name())
 }
 
 func unlockMutex() error {
 	overlap := new(syscall.Overlapped)
 
 	unlocked, _, err := store.UnlockFile.Call(
-		uintptr(MutexFile.Fd()),
+		uintptr(mutexFile.Fd()),
 		0,
 		1,
 		0,
@@ -63,8 +68,8 @@ func lockMutex() error {
 	overlap := new(syscall.Overlapped)
 
 	locked, _, err := store.LockFile.Call(
-		uintptr(MutexFile.Fd()),
-		0x00000002|0x00000001,
+		uintptr(mutexFile.Fd()),
+		_LOCKFILE_EXCLUSIVE_LOCK|_LOCKFILE_FAIL_IMMEDIATELY,
 		0,
 		1,
 		0,

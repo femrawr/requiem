@@ -7,8 +7,10 @@ import (
 	"requiem/utils"
 )
 
-const ROOT_DIR_PATH string = ""
-const MAX_TREE_DEPTH int = 2
+const (
+	ROOT_DIR_PATH  string = ""
+	MAX_TREE_DEPTH int    = 2
+)
 
 func TestGenerateFileTree(test *testing.T) {
 	tree, err := utils.GenFileTree(ROOT_DIR_PATH, MAX_TREE_DEPTH)

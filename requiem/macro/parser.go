@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func ParseMacro(filePath string) (*Macro, error) {
+func ParseMacro(filePath string) (*macroData, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func ParseMacro(filePath string) (*Macro, error) {
 	scanner.Scan() // header
 	scanner.Scan() // separator
 
-	macro := &Macro{}
+	macro := &macroData{}
 
 	atLine := 2
 
@@ -49,25 +49,25 @@ func ParseMacro(filePath string) (*Macro, error) {
 	return macro, nil
 }
 
-func parseLine(line string) (Line, error) {
+func parseLine(line string) (macroDataLine, error) {
 	cleaned := removeComment(line)
 
 	fields := strings.Fields(cleaned)
 	if len(fields) == 0 {
-		return Line{}, errors.New("the line is empty")
+		return macroDataLine{}, errors.New("the line is empty")
 	}
 
 	symbol := fields[0]
 	id, ok := symbols[symbol]
 	if !ok {
-		return Line{}, fmt.Errorf("invalid symbol: %q", symbol)
+		return macroDataLine{}, fmt.Errorf("invalid symbol: %q", symbol)
 	}
 
 	if len(fields) < 2 {
-		return Line{}, fmt.Errorf("symbol %q does not have a trailing value", symbol)
+		return macroDataLine{}, fmt.Errorf("symbol %q does not have a trailing value", symbol)
 	}
 
-	return Line{
+	return macroDataLine{
 		Line:   line,
 		Symbol: symbol,
 		ID:     id,

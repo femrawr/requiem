@@ -2,7 +2,7 @@ package funcs
 
 import (
 	"bytes"
-	"image/jpeg"
+	"image/png"
 
 	"github.com/vova616/screenshot"
 )
@@ -15,7 +15,7 @@ func TakeScreenshot() (*bytes.Buffer, error) {
 
 	var buffer bytes.Buffer
 
-	err = jpeg.Encode(&buffer, ss, nil)
+	err = png.Encode(&buffer, ss)
 	if err != nil {
 		return nil, err
 	}

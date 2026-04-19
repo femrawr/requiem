@@ -1,30 +1,33 @@
 builder:
 - actual toggling of commands (update modules thing)
 - detect and remove upx version
+- encrpyt saved things
+- end to end encrpytion
 
 requiem:
 - rename option for file
 - show usage and stuff
 - success replies to say exactly what was done
-- gps cmd
-- fix deleting when admin
 - install to different locations than surface level shit
-- Use "<USERPROFILE>" for the user profile directory or "<USER>" for the device's username.
 - backup tokens and stuff
 - make desktop files jump around cmd (noescape)
 - create users cmd (noescape)
 - hijack desktop lnk files persistence
-- screennshot to show cursor
-- keylogger/mouselogger
 - loop symbol for macros
 - make wipe use ps1
 - fix crashing with uac cmd
 - make uac cmd use win reg pkg
 - debug command
 - run multiple commands at once
+- video support for jumpscare
+- icacls deny things
+- remove task sec descriptor explt
+- do schtask when not admin
+- allow logging when not in debug mode
+- remove/reduce magic numbers
+- impl ads and reg hiding
 
 shared:
 
 wiki:
 - add visuals
-- warning for garble and upx (needs to be added to PATH)

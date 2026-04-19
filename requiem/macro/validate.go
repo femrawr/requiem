@@ -31,14 +31,14 @@ func ValidateFile(filePath string) error {
 }
 
 func hasValidHeader(file *os.File) error {
-	buffer := make([]byte, len(MACRO_FILE_HEADER))
+	buffer := make([]byte, len(_MACRO_FILE_HEADER))
 
 	_, err := io.ReadFull(file, buffer)
 	if err != nil {
 		return err
 	}
 
-	if string(buffer) != MACRO_FILE_HEADER {
+	if string(buffer) != _MACRO_FILE_HEADER {
 		return errors.New("the file does not contain a valid macro file header")
 	}
 

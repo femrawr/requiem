@@ -85,14 +85,20 @@ func main() {
 	var newDir string
 	var newName string
 
-	if store.USE_CUSTOM_NAME {
+	if store.USE_RANDOM_NAME {
+
+	} else if store.USE_CUSTOM_NAME {
 		newName = utils.Decrypt(store.CUSTOM_NAME)
+		newName = utils.CleanPath(newName)
 	} else {
 		newName = "_" + filepath.Base(store.ExecPath)
 	}
 
-	if store.USE_CUSTOM_DIR {
+	if store.USE_RANDOM_DIR {
+
+	} else if store.USE_CUSTOM_DIR {
 		newDir = utils.Decrypt(store.CUSTOM_DIR)
+		newDir = utils.ParsePath(newDir)
 	} else {
 		if store.IsAdmin {
 			newDir = path.Join(
