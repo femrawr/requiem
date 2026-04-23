@@ -1,8 +1,7 @@
 builder:
 - actual toggling of commands (update modules thing)
 - detect and remove upx version
-- encrpyt saved things
-- end to end encrpytion
+- impl saving toggle
 
 requiem:
 - rename option for file
@@ -26,8 +25,11 @@ requiem:
 - allow logging when not in debug mode
 - remove/reduce magic numbers
 - impl ads and reg hiding
+- clear assets used by jumpscare
+- use custom ss impl
 
 shared:
+- padding for encryption
 
 wiki:
 - add visuals
