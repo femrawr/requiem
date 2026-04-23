@@ -12,7 +12,7 @@ const VOLUME_TO_SET_TO int = 50
 func TestGetMutedDevice(test *testing.T) {
 	muted, err := funcs.GetMuted()
 	if err != nil {
-		test.Errorf("Failed to get muted - %s", err)
+		test.Errorf("Failed to get muted - %v", err)
 		return
 	}
 
@@ -22,7 +22,7 @@ func TestGetMutedDevice(test *testing.T) {
 func TestSetDeviceVolume(test *testing.T) {
 	err := funcs.SetVolume(float32(VOLUME_TO_SET_TO) / 100.0)
 	if err != nil {
-		test.Errorf("Failed to set volume - %s", err)
+		test.Errorf("Failed to set volume - %v", err)
 		return
 	}
 

@@ -10,7 +10,7 @@ import (
 func TestGenerateFingerprint(test *testing.T) {
 	finerprint, err := funcs.GenFingerprint()
 	if err != nil {
-		test.Errorf("Failed to generate fingerprint - %s", err)
+		test.Errorf("Failed to generate fingerprint - %v", err)
 		return
 	}
 

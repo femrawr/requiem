@@ -15,7 +15,7 @@ const (
 func TestGenerateFileTree(test *testing.T) {
 	tree, err := utils.GenFileTree(ROOT_DIR_PATH, MAX_TREE_DEPTH)
 	if err != nil {
-		test.Errorf("Failed to generate tree - %s", err)
+		test.Errorf("Failed to generate tree - %v", err)
 		return
 	}
 

@@ -6,7 +6,8 @@ import (
 	"regexp"
 
 	"requiem/store"
-	"requiem/utils"
+
+	"shared/higher"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -24,7 +25,7 @@ func GetConnectionMsg(new bool) string {
 
 	trackingID := ""
 	if store.TRACKING_ID != "" {
-		trackingID = " - " + utils.Decrypt(store.TRACKING_ID)
+		trackingID = " - " + higher.DecryptConfig(store.TRACKING_ID)
 	}
 
 	version := fmt.Sprintf(

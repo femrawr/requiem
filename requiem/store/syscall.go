@@ -22,13 +22,13 @@ var (
 	ChangeDisplay = user32.NewProc("ChangeDisplaySettingsA")
 	MessageBox    = user32.NewProc("MessageBoxW")
 	BlockInput    = user32.NewProc("BlockInput")
+	SendInput     = user32.NewProc("SendInput")
 
 	InitializeCOM   = ole32.NewProc("CoInitialize")
 	UninitializeCOM = ole32.NewProc("CoUninitialize")
 	CreateCOM       = ole32.NewProc("CoCreateInstance")
 
-	AmIAdmin  = shell32.NewProc("IsUserAnAdmin")
-	SendInput = user32.NewProc("SendInput")
+	AmIAdmin = shell32.NewProc("IsUserAnAdmin")
 
 	AdjustPrivilege = ntdll.NewProc("RtlAdjustPrivilege")
 	SetCritical     = ntdll.NewProc("RtlSetProcessIsCritical")
