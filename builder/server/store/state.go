@@ -22,6 +22,10 @@ var (
 	// the build tag, it is set in /routes/update_config.go
 	Tag string = "none"
 
+	// the key used to decrypt e2e config, it is set in /routes/get_key.go
+	SharedSecret []byte
+
+	// what operations should be dont on the build, it is set in /routes/update_config.go
 	Obfuscate bool = false
 	Pack      bool = false
 )

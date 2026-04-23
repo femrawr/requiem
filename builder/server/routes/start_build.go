@@ -40,7 +40,7 @@ func startBuild() {
 
 		err := utils.RunCommand(store.Main, buildWith, buildArgs...)
 		if err != nil {
-			http.Error(write, fmt.Sprintf("failed to build - %s", err), http.StatusInternalServerError)
+			http.Error(write, fmt.Sprintf("failed to build - %v", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -55,28 +55,31 @@ func startBuild() {
 			)
 
 			if err != nil {
-				http.Error(write, fmt.Sprintf("failed to pack build - %s", err), http.StatusInternalServerError)
+				http.Error(write, fmt.Sprintf("failed to pack build - %v", err), http.StatusInternalServerError)
 				return
 			}
 
 			err = os.Rename(packedTemp, buildPath)
 			if err != nil {
-				http.Error(write, fmt.Sprintf("failed to move packed build - %s", err), http.StatusInternalServerError)
+				http.Error(write, fmt.Sprintf("failed to move packed build - %v", err), http.StatusInternalServerError)
 				return
 			}
 
 			data, err := os.ReadFile(buildPath)
-			if err == nil {
-				data = bytes.ReplaceAll(data, []byte("UPX!"), []byte{0x00, 0x00, 0x00, 0x00})
-				data = bytes.ReplaceAll(data, []byte("UPX0"), []byte{0x00, 0x00, 0x00, 0x00})
-				data = bytes.ReplaceAll(data, []byte("UPX1"), []byte{0x00, 0x00, 0x00, 0x00})
-				data = bytes.ReplaceAll(data, []byte("UPX2"), []byte{0x00, 0x00, 0x00, 0x00})
+			if err != nil {
+				http.Error(write, fmt.Sprintf("failed to read packed build - %v", err), http.StatusInternalServerError)
+				return
+			}
 
-				err = os.WriteFile(buildPath, data, 0666)
-				if err != nil {
-					http.Error(write, fmt.Sprintf("failed mangle packed build - %s", err), http.StatusInternalServerError)
-					return
-				}
+			data = bytes.Replace(data, []byte("UPX!"), []byte{0, 0, 0, 0}, 1)
+			data = bytes.Replace(data, []byte("UPX0"), []byte{0, 0, 0, 0}, 1)
+			data = bytes.Replace(data, []byte("UPX1"), []byte{0, 0, 0, 0}, 1)
+			data = bytes.Replace(data, []byte("UPX2"), []byte{0, 0, 0, 0}, 1)
+
+			err = os.WriteFile(buildPath, data, 0666)
+			if err != nil {
+				http.Error(write, fmt.Sprintf("failed mangle packed build - %v", err), http.StatusInternalServerError)
+				return
 			}
 		}
 

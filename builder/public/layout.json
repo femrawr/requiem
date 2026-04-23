@@ -36,13 +36,18 @@
     "setup": [
         {
             "name": "Use custom directory",
-            "info": "Installs Requiem to a custom directory. If unchecked, Requiem will install to the music folder or Program Files folder if it has admin privileges.",
+            "info": "Installs Requiem to a custom directory. If unchecked, Requiem will install to the music folder or program files directory if it has admin privileges.",
             "type": "checkbox"
         },
         {
             "name": "Custom directory path",
             "info": "The path of the directory. Use \"<USERPROFILE>\" for the user profile directory or \"<USER>\" for the device's username.",
             "type": "text"
+        },
+        {
+            "name": "Randomize directory",
+            "info": "Picks a random directory from the user profile directory or program files directory if it has admin privileges. This has priority over \"Use custom directory\".",
+            "type": "checkbox"
         },
         {
             "type": "separator"
@@ -56,6 +61,32 @@
             "name": "Custom name",
             "info": "The name Requiem will rename itself to.",
             "type": "text"
+        },
+        {
+            "name": "Randomize name",
+            "info": "Picks a random name from any running executable file. This has prority over \"Use custom name\".",
+            "type": "checkbox"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Use alternate data stream",
+            "info": "Installs Requiem to a file's ADS.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Custom alternate data stream",
+            "info": "The Path of the ADS Requiem will install itself to.",
+            "type": "text"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Put in registry",
+            "info": "Stores Requiem's file data in a registry value.",
+            "type": "checkbox"
         }
     ],
     "options": [
@@ -122,6 +153,19 @@
             "value": "true"
         }
     ],
+    "site": [
+        {
+            "name": "End to end encryption",
+            "info": "Encrypts all saved data. Sends only encrypted data to the server.",
+            "type": "checkbox"
+        },
+        {
+            "name": "Save config",
+            "info": "Saved the data set in the site.",
+            "type": "checkbox",
+            "value": "true"
+        }
+    ],
     "build": [
         {
             "name": "Obfuscate build",
@@ -131,6 +175,14 @@
         {
             "name": "Pack build",
             "info": "Packs the build with UPX.",
+            "type": "checkbox"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Pad encrypted data",
+            "info": "Inserts dummy characters randomly in all encrypted data.",
             "type": "checkbox"
         }
     ]

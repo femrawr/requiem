@@ -253,14 +253,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.setAttribute('autocomplete', 'off');
     });
 
-    loadConfig();
+    loadConfig(e2ePassword);
 
     const inputs = document.querySelectorAll('input');
     const selects = document.querySelectorAll('select');
 
     [...inputs, ...selects].forEach((input) => {
-        input.addEventListener('input', () => {
-            localStorage.setItem(CFG_NAME, getConfig());
+        input.addEventListener('input', async (e) => {
+            localStorage.setItem(CFG_NAME, await getConfig(e2ePassword));
+
+            const target = e.target;
+            const value = (() => {
+                if (target.type === 'checkbox') {
+                    return target.checked;
+                } else {
+                    return target.value.trim();
+                }
+            })();
+
+            if (target.id === 'end_to_end_encryption') {
+                if (value) {
+                    if (localStorage.getItem(E2E_NAME)) {
+                        alert('End to end encryption is already active.');
+                        return;
+                    }
+
+                    const password = prompt('Enter password to turn on end to end encryption');
+                    if (password === '') {
+                        notif('Password is empty.');
+
+                        target.checked = false;
+                        localStorage.setItem(CFG_NAME, await getConfig());
+                        return;
+                    }
+
+                    e2ePassword = password;
+
+                    localStorage.setItem(CFG_NAME, await getConfig(e2ePassword));
+
+                    // this is for when the page reloads and the saved config has to be decrypted
+                    // this will verify is the password is correct
+                    localStorage.setItem(
+                        E2E_NAME,
+                        await encryptData(E2E_VERIFICATION_STRING, e2ePassword)
+                    );
+                } else {
+                    localStorage.setItem(CFG_NAME, await getConfig());
+                    localStorage.removeItem(E2E_NAME);
+                }
+            }
         });
     });
 });

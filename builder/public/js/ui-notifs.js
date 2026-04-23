@@ -1,6 +1,6 @@
 const notifs = document.querySelector('.notifs');
 
-const notif = (text, title = 'builder', type = 'info', time = 5) => {
+const notif = (text, title = 'builder', type = NOTIF_INFO, time = 5) => {
     const notif = document.createElement('div');
     notif.className = `notif ${type}`;
 

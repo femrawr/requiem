@@ -19,6 +19,10 @@
                     <button class="tab-button" data-tab="options">options</button>
                     <button class="tab-button" data-tab="persistence">persistence</button>
                     <button class="tab-button" data-tab="commands">commands</button>
+
+                    <div style="flex: 1;"></div>
+
+                    <button class="tab-button" data-tab="site" style="background: var(--primary)">site settings</button>
                     <button class="tab-button" data-tab="build" style="background: var(--primary)">build settings</button>
                 </div>
 
@@ -37,6 +41,8 @@
                     <div class="content" id="setup-tab"></div>
                     <div class="content" id="persistence-tab"></div>
                     <div class="content" id="commands-tab"></div>
+
+                    <div class="content" id="site-tab"></div>
                     <div class="content" id="build-tab"></div>
                 </div>
             </main>
@@ -45,9 +51,42 @@
         <div class="notifs"></div>
     </body>
 
+    <script src="js/util-crypto.js"></script>
+    <script src="js/util-saving.js"></script>
+    <script src="js/ui-notifs.js"></script>
+
     <script>
         const TAG_NAME = 'req.tag';
         const CFG_NAME = 'req.cfg';
+        const E2E_NAME = 'req.e2e';
+
+        const NOTIF_SUCC = 'success';
+        const NOTIF_INFO = 'info';
+        const NOTIF_WARN = 'warning';
+        const NOTIF_ERROR = 'error';
+
+        const E2E_VERIFICATION_STRING = 'verify00?';
+
+        let e2ePassword = undefined;
+
+        const encryptedVerificationString = localStorage.getItem(E2E_NAME);
+        if (encryptedVerificationString) {
+            const password = prompt('Enter password to decrypt data');
+            if (password === '') {
+                alert('Password is empty.');
+                location.reload();
+            }
+
+            e2ePassword = password;
+
+            (async () => {
+                await decryptData(encryptedVerificationString, e2ePassword)
+                    .catch((err) => {
+                        alert('Password is invalid.');
+                        location.reload();
+                    });
+            })();
+        }
 
         (async () => {
             const fetched = await fetch('/api/get-version');
@@ -59,7 +98,5 @@
 
     <script src="js/ui-settings.js"></script>
     <script src="js/ui-tag.js"></script>
-    <script src="js/ui-notifs.js"></script>
-    <script src="js/main-saving.js"></script>
     <script src="js/main-build.js"></script>
 </html>

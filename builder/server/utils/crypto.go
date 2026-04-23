@@ -1,26 +1,15 @@
 package utils
 
 import (
-	"fmt"
-	"shared"
+	"crypto/ecdh"
+	"crypto/rand"
 )
 
-var cryptoKey string
-
-func SetCryptKey(key string) {
-	cryptoKey = key
-}
-
-func Encrypt(data string) string {
-	if data == "" {
-		return ""
-	}
-
-	enc, err := shared.Encrypt(data, cryptoKey)
+func GenerateKey() (*ecdh.PrivateKey, error) {
+	key, err := ecdh.P256().GenerateKey(rand.Reader)
 	if err != nil {
-		fmt.Printf("failed to encrypt %s - %s\n", data, err)
-		return ""
+		return nil, err
 	}
 
-	return enc
+	return key, nil
 }

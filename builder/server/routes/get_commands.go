@@ -11,22 +11,23 @@ import (
 	"builder/store"
 )
 
+type command struct {
+	Name string `json:"name"`
+	Info string `json:"info"`
+}
+
 func getCommands() {
 	http.HandleFunc("/api/get-commands", func(write http.ResponseWriter, req *http.Request) {
 		commands := filepath.Join(store.Main, "bot", "commands")
 
 		items, err := os.ReadDir(commands)
 		if err != nil {
-			http.Error(write, fmt.Sprintf("failed to read dir - %s", err), http.StatusInternalServerError)
+			http.Error(write, fmt.Sprintf("failed to read dir - %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		type Command struct {
-			Name string `json:"name"`
-			Info string `json:"info"`
-		}
+		var result []command
 
-		var result []Command
 		nameRegex := regexp.MustCompile(`func \(.*?\) Name\(\) string \{\s*return "(.+?)"`)
 		infoRegex := regexp.MustCompile(`func \(.*?\) Info\(\) string \{\s*return "(.+?)"`)
 
@@ -48,7 +49,7 @@ func getCommands() {
 				continue
 			}
 
-			result = append(result, Command{
+			result = append(result, command{
 				Name: nameMatch[1],
 				Info: infoMatch[1],
 			})

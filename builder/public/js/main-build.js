@@ -18,32 +18,58 @@ const setTitle = (title) => {
 };
 
 build.addEventListener('click', async (e) => {
-    const config = await fetch('/api/update-config', {
+    let config = await getConfig();
+    let parsedConfig = JSON.parse(config);
+
+    if (parsedConfig.end_to_end_encryption === true) {
+        const clientKeys = await generateKeyPair();
+
+        const fetchedServerPublicKey = await fetch('/api/get-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: await exportPublicKey(clientKeys.publicKey) })
+        });
+
+        if (!fetchedServerPublicKey.ok) {
+            const text = await fetchedServerPublicKey.text();
+
+            notif(text + '\n\n' + 'See console for full error.', 'Failed to get server key.', NOTIF_ERROR, 10);
+            console.warn(text);
+            return;
+        }
+
+        const serverPublicKey = await fetchedServerPublicKey.text();
+        const sharedSecret = await getSharedSecret(clientKeys.privateKey, serverPublicKey);
+
+        config = await getConfig(sharedSecret);
+    }
+
+    const update = await fetch('/api/update-config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: getConfig()
+        body: config
     });
 
-    if (!config.ok) {
-        const text = await config.text();
+    if (!update.ok) {
+        const text = await update.text();
 
-        notif(text + '\n\n' + 'See console for full error.', 'Failed to update config', 'error', 10);
+        notif(text + '\n\n' + 'See console for full error.', 'Failed to update config', NOTIF_ERROR, 10);
         console.warn(text);
         return;
     }
 
     if (e.ctrlKey) {
-        notif('Successfully updated config', 'Builder', 'success', 10);
+        notif('Successfully updated config', 'Builder', NOTIF_SUCC, 10);
         return;
     }
 
-    const initial = notif('Building...', 'Builder', 'info', 900);
+    const initial = notif('Building...', 'Builder', NOTIF_INFO, 900);
     setTitle('Building');
 
     const build = await fetch('/api/start-build', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: getConfig()
+        body: config
     });
 
     if (!build.ok) {
@@ -52,7 +78,7 @@ build.addEventListener('click', async (e) => {
 
         const text = await build.text();
 
-        notif(text, 'Failed to build', 'error', 30);
+        notif(text, 'Failed to build', NOTIF_ERROR, 30);
         console.warn(text);
         return;
     }
@@ -62,7 +88,7 @@ build.addEventListener('click', async (e) => {
         .catch((err) => console.warn('failed to play sound -', err));
 
     delNotif(initial);
-    notif('Successfully built.', 'Builder', 'success', 90);
+    notif('Successfully built.', 'Builder', NOTIF_SUCC, 90);
     setTitle('Success');
 });
 
