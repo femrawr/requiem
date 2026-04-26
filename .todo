@@ -1,5 +1,4 @@
 builder:
-- actual toggling of commands (update modules thing)
 - detect and remove upx version
 - impl saving toggle
 
@@ -26,10 +25,20 @@ requiem:
 - remove/reduce magic numbers
 - impl ads and reg hiding
 - clear assets used by jumpscare
-- use custom ss impl
+- search for things in disassmbler
+- funcs of struct to have descriptive param instead of a
+- impl randomize persistence file location
+- see resource monitor http trafic
+
+modules/runner
+- reorder structs
+- stop using full len words for know things
 
 shared:
 - padding for encryption
+
+generic:
+- better errors in funcs that return more than 1 error
 
 wiki:
 - add visuals

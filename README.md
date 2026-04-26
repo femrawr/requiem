@@ -1,15 +1,17 @@
 # Requiem
-A super customizable remote administration tool controllable via a Discord bot.
-
-Check out the Wiki for more info: https://github.com/femrawr/requiem/wiki
+A super customizable remote administration tool controllable via a Discord bot. <br>
+Check out [the wiki](https://github.com/femrawr/requiem/tree/main/.wiki) for more detailed and technical information. <br>
 
 ## Features
-- Take pictures of the desktop
-- Adjust display settings
+- Super customizable
+- Take screenshots and webcam pictures
+- Adjust system and display settings
 - Various file related utilities
 - Self updating
 - Macro system
 - Runtime settings system
+- Securely wipe from the device
+- Many persistence techniques
 
 And much more!
 
