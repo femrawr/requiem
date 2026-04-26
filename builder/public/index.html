@@ -14,14 +14,15 @@
         <div class="container">
             <div class="sidebar">
                 <div class="tab-container">
+                    <div class="tab-title">main</div>
                     <button class="tab-button active" data-tab="bot">bot</button>
                     <button class="tab-button" data-tab="setup">setup</button>
                     <button class="tab-button" data-tab="options">options</button>
                     <button class="tab-button" data-tab="persistence">persistence</button>
-                    <button class="tab-button" data-tab="commands">commands</button>
 
-                    <div style="flex: 1;"></div>
+                    <div class="tab-divider"></div>
 
+                    <div class="tab-title">generic</div>
                     <button class="tab-button" data-tab="site" style="background: var(--primary)">site settings</button>
                     <button class="tab-button" data-tab="build" style="background: var(--primary)">build settings</button>
                 </div>
@@ -40,7 +41,6 @@
                     <div class="content" id="options-tab"></div>
                     <div class="content" id="setup-tab"></div>
                     <div class="content" id="persistence-tab"></div>
-                    <div class="content" id="commands-tab"></div>
 
                     <div class="content" id="site-tab"></div>
                     <div class="content" id="build-tab"></div>
@@ -69,8 +69,8 @@
 
         let e2ePassword = undefined;
 
-        const encryptedVerificationString = localStorage.getItem(E2E_NAME);
-        if (encryptedVerificationString) {
+        const e2eVerification = localStorage.getItem(E2E_NAME);
+        if (e2eVerification) {
             const password = prompt('Enter password to decrypt data');
             if (password === '') {
                 alert('Password is empty.');
@@ -80,7 +80,7 @@
             e2ePassword = password;
 
             (async () => {
-                await decryptData(encryptedVerificationString, e2ePassword)
+                await decryptData(e2eVerification, e2ePassword)
                     .catch((err) => {
                         alert('Password is invalid.');
                         location.reload();

@@ -233,21 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const fetchedCommands = await fetch('/api/get-commands');
-    const commands = await fetchedCommands.json();
-
-    const commandsParent = document.getElementById('commands-tab');
-
-    commands.forEach((config) => {
-        const box = createSetting({
-            ...config,
-            type: 'checkbox',
-            value: true
-        });
-
-        commandsParent.appendChild(box);
-    });
-
     document.querySelectorAll('input').forEach((input) => {
         input.setAttribute('spellcheck', 'false');
         input.setAttribute('autocomplete', 'off');

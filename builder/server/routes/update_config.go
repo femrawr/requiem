@@ -51,33 +51,6 @@ type configBody struct {
 	TaskSchedular   bool   `json:"task_schedular"`
 	Registry        bool   `json:"registry"`
 
-	Audio      bool `json:"audio"`
-	Brightness bool `json:"brightness"`
-	Bsod       bool `json:"bsod"`
-	Critical   bool `json:"critical"`
-	Download   bool `json:"download"`
-	File       bool `json:"file"`
-	Input      bool `json:"input"`
-	Jumpscare  bool `json:"jumpscare"`
-	Macro      bool `json:"macro"`
-	Msgbox     bool `json:"msgbox"`
-	Persist    bool `json:"persist"`
-	Ping       bool `json:"ping"`
-	Process    bool `json:"process"`
-	Rotate     bool `json:"rotate"`
-	Run        bool `json:"run"`
-	Ss         bool `json:"ss"`
-	Settings   bool `json:"settings"`
-	Site       bool `json:"site"`
-	Tree       bool `json:"tree"`
-	Tts        bool `json:"tts"`
-	Uac        bool `json:"uac"`
-	Update     bool `json:"update"`
-	Upload     bool `json:"upload"`
-	Volume     bool `json:"volume"`
-	Wallpaper  bool `json:"wallpaper"`
-	Wipe       bool `json:"wipe"`
-
 	ObfuscateBuild bool `json:"obfuscate_build"`
 	PackBuild      bool `json:"pack_build"`
 }
@@ -87,7 +60,7 @@ func updateConfig() {
 		config := filepath.Join(store.Main, "store", "config.go")
 
 		if store.DEBUG {
-			fmt.Println("requiem config - " + config)
+			fmt.Println("requiem config file - " + config)
 		}
 
 		var rawBody map[string]any
@@ -196,8 +169,6 @@ func updateConfig() {
 		}
 
 		store.Tag = body.Tag
-
-		// todo: update modules thing
 
 		write.WriteHeader(http.StatusOK)
 	})
