@@ -11,6 +11,11 @@ var (
 	mfplat   = syscall.NewLazyDLL("mfplat.dll")
 	mf       = syscall.NewLazyDLL("mf.dll")
 	mfrw     = syscall.NewLazyDLL("mfreadwrite.dll")
+	gdi32    = syscall.NewLazyDLL("gdi32.dll")
+)
+
+var (
+	getLastError = kernel32.NewProc("GetLastError")
 )
 
 var (
@@ -23,6 +28,8 @@ var (
 	MessageBox    = user32.NewProc("MessageBoxW")
 	BlockInput    = user32.NewProc("BlockInput")
 	SendInput     = user32.NewProc("SendInput")
+	GetContext    = user32.NewProc("GetDC")
+	ReleaseCotext = user32.NewProc("ReleaseDC")
 
 	InitializeCOM   = ole32.NewProc("CoInitialize")
 	UninitializeCOM = ole32.NewProc("CoUninitialize")
@@ -42,4 +49,17 @@ var (
 	MediaEnumerateDevices = mf.NewProc("MFEnumDeviceSources")
 
 	MediaCreateReader = mfrw.NewProc("MFCreateSourceReaderFromMediaSource")
+
+	DeleteCotext       = gdi32.NewProc("DeleteDC")
+	BitBlockTransfer   = gdi32.NewProc("BitBlt")
+	DeleteObject       = gdi32.NewProc("DeleteObject")
+	SelectObject       = gdi32.NewProc("SelectObject")
+	CreateBitmapBuffer = gdi32.NewProc("CreateDIBSection")
+	CreateGoodContext  = gdi32.NewProc("CreateCompatibleDC")
+	GetDeviceCaps      = gdi32.NewProc("GetDeviceCaps")
 )
+
+func GetError() uint32 {
+	ret, _, _ := getLastError.Call()
+	return uint32(ret)
+}

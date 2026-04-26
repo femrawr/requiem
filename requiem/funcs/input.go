@@ -2,6 +2,7 @@ package funcs
 
 import (
 	"errors"
+	"fmt"
 
 	"requiem/store"
 )
@@ -18,7 +19,7 @@ func DisableInputs(disable bool) error {
 
 	ret, _, err := store.BlockInput.Call(uintptr(disabled))
 	if ret == 0 {
-		return err
+		return fmt.Errorf("%v (code %d)", err, store.GetError())
 	}
 
 	return nil

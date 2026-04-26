@@ -76,7 +76,7 @@ func Start() {
 
 	message := discord.GetConnectionMsg(new)
 
-	pic, err := funcs.TakeScreenshot()
+	pic, err := funcs.CaptureScreen()
 	if err != nil {
 		bot.ChannelMessageSend(channelID, message)
 		return
