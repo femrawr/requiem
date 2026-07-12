@@ -17,7 +17,7 @@ func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, ar
 		return
 	}
 
-	if len(args) >= 2 && strings.ContainsAny(strings.ToLower(args[1]), "shutdown") && store.DEBUG_MODE && store.BLOCK_DANGEROUS_FUNCS_IN_DEBUG_MODE {
+	if len(args) >= 2 && strings.ContainsAny(strings.ToLower(args[1]), "shutdown") && store.DEBUG_MODE && store.DEBUG_MODE_BLOCK_DANGEROUS_FUNCS {
 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You cannot do this in debug mode.", msg.Reference())
 		return
 	}
