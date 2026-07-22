@@ -7,9 +7,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"shared/base"
 	"testing"
-
-	"shared"
 )
 
 const (
@@ -25,7 +24,7 @@ const (
 )
 
 func TestCryptData(test *testing.T) {
-	encrypted, err := shared.EncryptData(DATA_TO_ENCRYPT, []byte(ENCRYPTION_KEY), PAD_ENCRPTION)
+	encrypted, err := base.EncryptData(DATA_TO_ENCRYPT, []byte(ENCRYPTION_KEY), PAD_ENCRPTION)
 	if err != nil {
 		test.Errorf("Failed to encrypt - %v", err)
 		return
@@ -33,7 +32,7 @@ func TestCryptData(test *testing.T) {
 
 	fmt.Printf("Encrypted - %s\n", encrypted)
 
-	decrypted, err := shared.DecryptData(encrypted, []byte(ENCRYPTION_KEY), PAD_ENCRPTION)
+	decrypted, err := base.DecryptData(encrypted, []byte(ENCRYPTION_KEY), PAD_ENCRPTION)
 	if err != nil {
 		test.Errorf("Failed to decrypt - %v", err)
 		return
@@ -77,13 +76,13 @@ func TestCryptFile(test *testing.T) {
 	srcFileHash := sha256.Sum256(fileData)
 	fmt.Printf("Original file hash  - %x\n", srcFileHash)
 
-	err = shared.EncryptFile(srcFilePath, encFilePath, ENCRYPTION_KEY, FILE_ENCRYPT_CHUNK_SIZE)
+	err = base.EncryptFile(srcFilePath, encFilePath, ENCRYPTION_KEY, FILE_ENCRYPT_CHUNK_SIZE)
 	if err != nil {
 		test.Errorf("Failed to encrypt file - %v", err)
 		return
 	}
 
-	err = shared.DecryptFile(encFilePath, decFilePath, ENCRYPTION_KEY, FILE_ENCRYPT_CHUNK_SIZE)
+	err = base.DecryptFile(encFilePath, decFilePath, ENCRYPTION_KEY, FILE_ENCRYPT_CHUNK_SIZE)
 	if err != nil {
 		test.Errorf("Failed to decrypt file - %v", err)
 		return

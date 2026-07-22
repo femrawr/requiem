@@ -1,6 +1,8 @@
 builder:
 - detect and remove upx version
 - impl saving toggle
+- if no password for e2ee, disable it
+- better build console info
 
 requiem:
 - rename option for file
@@ -29,6 +31,7 @@ requiem:
 - funcs of struct to have descriptive param instead of a
 - impl randomize persistence file location
 - see resource monitor http trafic
+- fix update module
 
 modules/runner
 - reorder structs
