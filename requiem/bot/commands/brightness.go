@@ -5,26 +5,25 @@ import (
 	"strconv"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*LightCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*LightCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 	if len(content) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a brightness level.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a brightness level.")
 		return
 	}
 
 	level, err := strconv.Atoi(args[0])
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to resolve brightness - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to resolve brightness - %s", err))
 		return
 	}
 
 	if level < 0 || level > 100 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Light level needs to be between 1 and 100.", msg.Reference())
+		ctx.ReplyMsg("🟥 Light level needs to be between 1 and 100.")
 		return
 	}
 
@@ -35,11 +34,11 @@ func (*LightCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	)
 
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set brightness - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to set brightness - %s", err))
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set brightness.", msg.Reference())
+	ctx.ReplyMsg("🟩 Successfully set brightness.")
 }
 
 func (*LightCommand) Name() string {

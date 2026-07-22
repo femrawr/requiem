@@ -5,29 +5,28 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*WipeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully wiped.", msg.Reference())
+func (*WipeCommand) Exec(ctx *store.CommandContext, args []string) {
+	initial, _ := ctx.ReplyMsg("🟩 Successfully wiped.")
 
 	content := strings.Join(args, " ")
 	secure := utils.HasFlag(content, "secure")
 
-	err := ses.Close()
+	err := ctx.Session.Close()
 	if err != nil {
-		ses.ChannelMessageEdit(msg.ChannelID, initial.ID, fmt.Sprintf("🟥 Failed to close bot session - %s", err))
+		ctx.EditMsg(initial.ID, fmt.Sprintf("🟥 Failed to close bot session - %s", err))
 	}
 
 	err = funcs.Wipe(secure)
 	if err != nil {
-		ses.ChannelMessageEdit(msg.ChannelID, initial.ID, fmt.Sprintf("🟥 Failed to wipe - %s", err))
+		ctx.EditMsg(initial.ID, fmt.Sprintf("🟥 Failed to wipe - %s", err))
 		return
 	}
 
-	ses.ChannelMessageEdit(msg.ChannelID, initial.ID, "🟥 Failed to wipe.")
+	ctx.EditMsg(initial.ID, "🟥 Failed to wipe.")
 }
 
 func (*WipeCommand) Name() string {

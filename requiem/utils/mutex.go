@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -10,6 +11,8 @@ import (
 )
 
 const (
+	_DEBUG_MUTEX_PREFIX string = "requiem mutex"
+
 	_LOCKFILE_EXCLUSIVE_LOCK   uintptr = 0x00000002
 	_LOCKFILE_FAIL_IMMEDIATELY uintptr = 0x00000001
 )
@@ -17,7 +20,12 @@ const (
 var mutexFile *os.File
 
 func CheckMutex() bool {
-	path := filepath.Join(os.TempDir(), store.MUTEX_NAME)
+	mutexName := store.MUTEX_NAME
+	if store.DEBUG_MODE {
+		mutexName = fmt.Sprintf("%s %s", _DEBUG_MUTEX_PREFIX, mutexName)
+	}
+
+	path := filepath.Join(os.TempDir(), mutexName)
 
 	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {

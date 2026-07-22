@@ -7,8 +7,6 @@ import (
 
 	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 var (
@@ -16,20 +14,19 @@ var (
 
 	cmdList map[string]store.Command
 
-	session *discordgo.Session
-	message *discordgo.MessageCreate
+	context *store.CommandContext
 )
 
-func Init(cmds map[string]store.Command, ses *discordgo.Session, msg *discordgo.MessageCreate) {
+func Init(cmds map[string]store.Command, ctx *store.CommandContext) {
 	if inited {
 		return
 	}
 
-	cmdList = cmds
-	session = ses
-	message = msg
-
 	inited = true
+
+	cmdList = cmds
+
+	context = ctx
 }
 
 func RunMacro(macro string) error {
@@ -81,15 +78,15 @@ func execDiscordCommand(cmd string, args []string) error {
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				session.ChannelMessageSendReply(
-					message.ChannelID,
+				context.Session.ChannelMessageSendReply(
+					context.ChannelID,
 					fmt.Sprintf("⚠️ FATAL ERROR: %v", err),
-					message.Reference(),
+					context.Message.Reference(),
 				)
 			}
 		}()
 
-		command.Exec(session, message, args)
+		command.Exec(context, args)
 	}()
 
 	return nil

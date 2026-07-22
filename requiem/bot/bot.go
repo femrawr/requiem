@@ -12,7 +12,7 @@ import (
 	"requiem/utils"
 	"requiem/utils/discord"
 
-	"shared/higher"
+	"shared"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -20,21 +20,22 @@ import (
 var (
 	targetChannel string
 
-	lastMessageContext *discordgo.MessageCreate
-	lastCommand        string
-	lastArguments      []string
+	lastContext   *store.CommandContext
+	lastCommand   string
+	lastArguments []string
 )
 
 func Start() {
-	store.DecryptedServerID = higher.DecryptConfig(store.SERVER_ID)
+	store.DecryptedServerID = shared.DecryptConfig(store.SERVER_ID)
 
-	bot, err := discordgo.New("Bot " + higher.DecryptConfig(store.BOT_TOKEN))
+	bot, err := discordgo.New("Bot " + shared.DecryptConfig(store.BOT_TOKEN))
 	if err != nil {
 		cannotConnect("failed to create bot", err) // this will literally never fail
 		return
 	}
 
-	bot.AddHandler(handler)
+	bot.AddHandler(messageHandler)
+	bot.AddHandler(interactionHandler)
 
 	for i := range store.OPEN_BOT_SOCKET_MAX_RETRIES {
 		err = bot.Open()
@@ -54,9 +55,11 @@ func Start() {
 
 	macro.LoadMacros()
 	store.LoadSettings()
-	registerCommands()
 
-	categoryID := higher.DecryptConfig(store.CATEGORY_ID)
+	registerCommands()
+	registerButtons()
+
+	categoryID := shared.DecryptConfig(store.CATEGORY_ID)
 	if categoryID == "" {
 		categoryID, err = discord.FindOrCreateFallbackCategory(bot)
 		if err != nil {
@@ -93,8 +96,17 @@ func Start() {
 	select {}
 }
 
-func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
-	macro.Init(commandsList, ses, msg)
+func messageHandler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
+	context := &store.CommandContext{
+		Session:     ses,
+		Message:     msg,
+		ChannelID:   msg.ChannelID,
+		Content:     msg.Content,
+		Attachments: msg.Attachments,
+		Author:      msg.Author,
+	}
+
+	macro.Init(commandsList, context)
 
 	if msg.Author.ID == ses.State.User.ID {
 		return
@@ -124,7 +136,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 				}
 			}()
 
-			commandsList[lastCommand].Exec(ses, lastMessageContext, lastArguments)
+			commandsList[lastCommand].Exec(lastContext, lastArguments)
 		}()
 
 		return
@@ -174,7 +186,7 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 		return
 	}
 
-	lastMessageContext = msg
+	lastContext = context
 	lastCommand = name
 	lastArguments = args
 
@@ -189,7 +201,48 @@ func handler(ses *discordgo.Session, msg *discordgo.MessageCreate) {
 			}
 		}()
 
-		command.Exec(ses, msg, args)
+		command.Exec(context, args)
+	}()
+}
+
+func interactionHandler(ses *discordgo.Session, itr *discordgo.InteractionCreate) {
+	if itr.Type != discordgo.InteractionMessageComponent {
+		return
+	}
+
+	id := itr.MessageComponentData().CustomID
+	split := strings.Split(id, ".")
+
+	if len(split) != 2 {
+		return
+	}
+
+	cmd, exists := commandsList[split[0]]
+	if !exists {
+		return
+	}
+
+	button, exists := buttonssList[split[1]]
+	if !exists {
+		return
+	}
+
+	ses.InteractionRespond(itr.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Processing...",
+			Flags:   discordgo.MessageFlagsEphemeral,
+		},
+	})
+
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				utils.DebugLog(fmt.Sprintf("⚠️ FATAL ERROR - %v", err))
+			}
+		}()
+
+		button.Exec(ses, itr, cmd)
 	}()
 }
 

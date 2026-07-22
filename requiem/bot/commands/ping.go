@@ -1,11 +1,9 @@
 package commands
 
-import (
-	"github.com/bwmarrin/discordgo"
-)
+import "requiem/store"
 
-func (*PingCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	ses.ChannelMessageSendReply(msg.ChannelID, "Pong.", msg.Reference())
+func (*PingCommand) Exec(ctx *store.CommandContext, args []string) {
+	ctx.ReplyMsg("Pong.")
 }
 
 func (*PingCommand) Name() string {

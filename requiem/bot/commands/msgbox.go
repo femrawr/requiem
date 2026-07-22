@@ -7,24 +7,22 @@ import (
 	"unsafe"
 
 	"requiem/store"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*NotifCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*NotifCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 	if len(content) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a message.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a message.")
 		return
 	}
 
 	pointer, err := syscall.UTF16PtrFromString(content)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to convert message - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to convert message - %s", err))
 		return
 	}
 
-	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully sent messagebox.", msg.Reference())
+	initial, _ := ctx.ReplyMsg("🟩 Successfully sent messagebox.")
 
 	go func() {
 		ret, _, err := store.MessageBox.Call(
@@ -35,12 +33,12 @@ func (*NotifCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		)
 
 		if ret == 0 {
-			ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create messagebox - %s", err), msg.Reference())
+			ctx.DeleteMsg(initial.ID)
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to create messagebox - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "Messagebox acknowledgeded.", msg.Reference())
+		ctx.ReplyMsg("Messagebox acknowledgeded.")
 	}()
 }
 

@@ -7,14 +7,12 @@ import (
 	"requiem/funcs"
 	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*SpeakCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*SpeakCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 	if len(content) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a message.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a message.")
 		return
 	}
 
@@ -41,11 +39,11 @@ func (*SpeakCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	}
 
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to play message - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to play message - %s", err))
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully played message.", msg.Reference())
+	ctx.ReplyMsg("🟩 Successfully played message.")
 }
 
 func (*SpeakCommand) Name() string {

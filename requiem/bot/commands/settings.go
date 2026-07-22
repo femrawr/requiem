@@ -8,13 +8,11 @@ import (
 
 	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*SettingsCommand) Exec(ctx *store.CommandContext, args []string) {
 	if len(args) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a flag.")
 		return
 	}
 
@@ -22,12 +20,7 @@ func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 	if utils.HasFlag(content, "set") {
 		setting := utils.UnwrapQuotes(content)
 		if setting == "" {
-			ses.ChannelMessageSendReply(
-				msg.ChannelID,
-				"🟥 You need to provide a setting wrapped in double quotes.",
-				msg.Reference(),
-			)
-
+			ctx.ReplyMsg("🟥 You need to provide a setting wrapped in double quotes.")
 			return
 		}
 
@@ -51,18 +44,13 @@ func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 			case reflect.Bool:
 				b, err := strconv.ParseBool(value)
 				if err != nil {
-					ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Invalid bool value: %q", value), msg.Reference())
+					ctx.ReplyMsg(fmt.Sprintf("🟥 Invalid bool value: %q", value))
 					return
 				}
 
 				theValue.Field(i).SetBool(b)
 			default:
-				ses.ChannelMessageSendReply(
-					msg.ChannelID,
-					fmt.Sprintf("🟥 Unsupported type for setting %q", setting),
-					msg.Reference(),
-				)
-
+				ctx.ReplyMsg(fmt.Sprintf("🟥 Unsupported type for setting %q", setting))
 				return
 			}
 
@@ -70,24 +58,24 @@ func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 		}
 
 		if !found {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Setting %q does not exist.", setting), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Setting %q does not exist.", setting))
 			return
 		}
 
 		err := store.SaveSettings()
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to save - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to save - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟩 Successfully set %q to %q.", setting, value), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟩 Successfully set %q to %q.", setting, value))
 		return
 	}
 
 	if utils.HasFlag(content, "get") {
 		setting := utils.UnwrapQuotes(content)
 		if setting == "" {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a setting wrapped in double quotes.", msg.Reference())
+			ctx.ReplyMsg("🟥 You need to provide a setting wrapped in double quotes.")
 			return
 		}
 
@@ -100,16 +88,11 @@ func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 				continue
 			}
 
-			ses.ChannelMessageSendReply(
-				msg.ChannelID,
-				fmt.Sprintf("%q = `%v`", setting, theValue.Field(i).Interface()),
-				msg.Reference(),
-			)
-
+			ctx.ReplyMsg(fmt.Sprintf("%q = `%v`", setting, theValue.Field(i).Interface()))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Setting %q does not exist.", setting), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Setting %q does not exist.", setting))
 		return
 	}
 
@@ -129,11 +112,11 @@ func (*SettingsCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreat
 			fmt.Fprintf(&settings, "%s -> %v\n", key, value)
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("Settings:\n```\n%s\n```", settings.String()), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("Settings:\n```\n%s\n```", settings.String()))
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+	ctx.ReplyMsg("🟥 Invalid flag.")
 }
 
 func (*SettingsCommand) Name() string {

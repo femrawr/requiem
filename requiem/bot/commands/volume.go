@@ -6,56 +6,55 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*VolumeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*VolumeCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 	if len(content) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a volume level.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a volume level.")
 		return
 	}
 
 	if utils.HasFlag(content, "mute") {
 		err := funcs.SetMuted(true)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to mute - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to mute - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully muted.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully muted.")
 		return
 	}
 
 	if utils.HasFlag(content, "unmute") {
 		err := funcs.SetMuted(false)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to unmute - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to unmute - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unmuted.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully unmuted.")
 		return
 	}
 
 	level, err := strconv.Atoi(args[0])
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to resolve volume - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to resolve volume - %s", err))
 		return
 	}
 
 	if level < 0 || level > 100 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Volume level needs to be between 1 and 100.", msg.Reference())
+		ctx.ReplyMsg("🟥 Volume level needs to be between 1 and 100.")
 		return
 	}
 
 	err = funcs.SetVolume(float32(level) / 100.0)
 	if err == nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set volume.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully set volume.")
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set volume - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to set volume - %s", err))
 	}
 }
 

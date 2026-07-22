@@ -7,18 +7,16 @@ import (
 
 	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*RunCommand) Exec(ctx *store.CommandContext, args []string) {
 	if len(args) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a program to run.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a program to run.")
 		return
 	}
 
 	if len(args) >= 2 && strings.ContainsAny(strings.ToLower(args[1]), "shutdown") && store.DEBUG_MODE && store.DEBUG_MODE_BLOCK_DANGEROUS_FUNCS {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You cannot do this in debug mode.", msg.Reference())
+		ctx.ReplyMsg("🟥 You cannot do this in debug mode.")
 		return
 	}
 
@@ -39,7 +37,7 @@ func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, ar
 
 	err := cmd.Run()
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to run - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to run - %s", err))
 		return
 	}
 
@@ -57,7 +55,7 @@ func (*RunCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, ar
 		response.WriteString("No output.")
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, response.String(), msg.Reference())
+	ctx.ReplyMsg(response.String())
 }
 
 func (*RunCommand) Name() string {

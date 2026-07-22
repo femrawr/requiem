@@ -6,14 +6,15 @@ import (
 	"strconv"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func (*TreeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*TreeCommand) Exec(ctx *store.CommandContext, args []string) {
 	if len(args) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a path.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a path.")
 		return
 	}
 
@@ -33,14 +34,14 @@ func (*TreeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	tree, err := utils.GenFileTree(path, depth)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to generate tree - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to generate tree - %s", err))
 		return
 	}
 
 	if len(tree) > 1900 {
-		ses.ChannelMessageSendComplex(msg.ChannelID, &discordgo.MessageSend{
+		ctx.SendComplexMsg(&discordgo.MessageSend{
 			Content:   "🟩 Successfully generated.",
-			Reference: msg.Reference(),
+			Reference: ctx.Message.Reference(),
 			Files: []*discordgo.File{{
 				Name:        "tree.txt",
 				ContentType: "text/plain",
@@ -49,7 +50,7 @@ func (*TreeCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		})
 	} else {
 		tree = "🟩 Successfully generated.\n```\n" + tree + "\n```"
-		ses.ChannelMessageSendReply(msg.ChannelID, tree, msg.Reference())
+		ctx.ReplyMsg(tree)
 	}
 }
 

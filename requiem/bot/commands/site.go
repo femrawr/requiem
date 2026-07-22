@@ -7,14 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*SiteCommand) Exec(ctx *store.CommandContext, args []string) {
 	if len(args) < 2 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag and a website.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a flag and a website.")
 		return
 	}
 
@@ -24,7 +23,7 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	site := utils.UnwrapQuotes(content)
 	if site == "" && !list {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the website in double quotes.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to wrap the website in double quotes.")
 		return
 	}
 
@@ -32,7 +31,7 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_APPEND, 0666)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open file - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to open file - %s", err))
 		return
 	}
 
@@ -49,24 +48,24 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 				continue
 			}
 
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 This site is already blocked.", msg.Reference())
+			ctx.ReplyMsg("🟥 This site is already blocked.")
 			return
 		}
 
 		_, err = file.WriteString("\n" + site)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to write file - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to write file - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully blocked website.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully blocked website.")
 		return
 	}
 
 	if utils.HasFlag(content, "unblock") {
 		data, err := os.ReadFile(path)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read file - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to read file - %s", err))
 			return
 		}
 
@@ -83,24 +82,24 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		}
 
 		if !found {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 This site is not blocked.", msg.Reference())
+			ctx.ReplyMsg("🟥 This site is not blocked.")
 			return
 		}
 
 		err = os.WriteFile(path, []byte(strings.Join(newLines, "\n")), 0666)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to write file - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to write file - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unblocked website.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully unblocked website.")
 		return
 	}
 
 	if list {
 		data, err := os.ReadFile(path)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read file - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to read file - %s", err))
 			return
 		}
 
@@ -120,15 +119,15 @@ func (*SiteCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		}
 
 		if len(sites) == 0 {
-			ses.ChannelMessageSendReply(msg.ChannelID, "There are no blocked sites.", msg.Reference())
+			ctx.ReplyMsg("There are no blocked sites.")
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "Blocked sites:\n```\n"+strings.Join(sites, "\n")+"```", msg.Reference())
+		ctx.ReplyMsg("Blocked sites:\n```\n" + strings.Join(sites, "\n") + "```")
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+	ctx.ReplyMsg("🟥 Invalid flag.")
 }
 
 func (*SiteCommand) Name() string {

@@ -8,16 +8,15 @@ import (
 	"time"
 
 	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*UpdateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	urls := discord.GetUrls(msg)
+func (*UpdateCommand) Exec(ctx *store.CommandContext, args []string) {
+	urls := discord.GetUrls(ctx)
 	if len(urls) == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any urls.")
 		return
 	}
 
@@ -34,13 +33,13 @@ func (*UpdateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	}
 
 	if theUrl == "" {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any executable files.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any executable files.")
 		return
 	}
 
 	path, err := utils.DownloadFile(urls[0], "")
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to download - %s", err))
 		return
 	}
 
@@ -54,11 +53,11 @@ func (*UpdateCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 
 	err = os.WriteFile(path, []byte(update.String()), 0666)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to write file - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to write file - %s", err))
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "Updating...", msg.Reference())
+	ctx.ReplyMsg("Updating...")
 
 	cmd := utils.StartCommand("cmd", "/c", path)
 	cmd.Start()

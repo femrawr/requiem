@@ -9,20 +9,18 @@ import (
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*WallpaperCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	urls := discord.GetUrls(msg)
+func (*WallpaperCommand) Exec(ctx *store.CommandContext, args []string) {
+	urls := discord.GetUrls(ctx)
 	if len(urls) == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any urls.")
 		return
 	}
 
 	path, err := utils.DownloadFile(urls[0], "")
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to download - %s", err))
 		return
 	}
 
@@ -30,7 +28,7 @@ func (*WallpaperCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCrea
 
 	pointer, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to resolve path - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to resolve path - %s", err))
 		return
 	}
 
@@ -42,11 +40,11 @@ func (*WallpaperCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCrea
 	)
 
 	if ret == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to set wallpaper.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to set wallpaper.")
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set wallpaper.", msg.Reference())
+	ctx.ReplyMsg("🟩 Successfully set wallpaper.")
 }
 
 func (*WallpaperCommand) Name() string {

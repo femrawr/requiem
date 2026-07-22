@@ -4,41 +4,40 @@ import (
 	"strings"
 
 	"requiem/persistence"
+	"requiem/store"
 	"requiem/utils"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*PersistCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*PersistCommand) Exec(ctx *store.CommandContext, args []string) {
 	content := strings.Join(args, " ")
 	if utils.HasFlag(content, "unpersist") {
 		err := persistence.RunRegistryUnpersist()
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to unpersist (run registry).", msg.Reference())
+			ctx.ReplyMsg("🟥 Failed to unpersist (run registry).")
 		}
 
 		err = persistence.SchedularUnpersist()
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to unpersist (schedular).", msg.Reference())
+			ctx.ReplyMsg("🟥 Failed to unpersist (schedular).")
 			return
 		}
 
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully unpersisted.", msg.Reference())
+		ctx.ReplyMsg("🟩 Successfully unpersisted.")
 		return
 	}
 
 	err := persistence.RunRegistryPersist("", true)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to persist (run registry).", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to persist (run registry).")
 	}
 
 	err = persistence.SchedularPersist("", true)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to persist (schedular).", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to persist (schedular).")
 		return
 	}
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully persisted.", msg.Reference())
+	ctx.ReplyMsg("🟩 Successfully persisted.")
 }
 
 func (*PersistCommand) Name() string {

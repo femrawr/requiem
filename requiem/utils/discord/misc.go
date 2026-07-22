@@ -7,9 +7,7 @@ import (
 
 	"requiem/store"
 
-	"shared/higher"
-
-	"github.com/bwmarrin/discordgo"
+	"shared"
 )
 
 func GetConnectionMsg(new bool) string {
@@ -25,7 +23,7 @@ func GetConnectionMsg(new bool) string {
 
 	trackingID := ""
 	if store.TRACKING_ID != "" {
-		trackingID = " - " + higher.DecryptConfig(store.TRACKING_ID)
+		trackingID = " - " + shared.DecryptConfig(store.TRACKING_ID)
 	}
 
 	version := fmt.Sprintf(
@@ -53,24 +51,25 @@ func GetConnectionMsg(new bool) string {
 	)
 }
 
-func GetUrls(msg *discordgo.MessageCreate) []string {
+func GetUrls(ctx *store.CommandContext) []string {
 	var urls []string
 
 	regex := regexp.MustCompile(`https?://[^\s]+`)
 
-	matches := regex.FindAllString(msg.Content, -1)
+	matches := regex.FindAllString(ctx.Content, -1)
 	urls = append(urls, matches...)
 
-	for _, attachment := range msg.Attachments {
+	for _, attachment := range ctx.Attachments {
 		urls = append(urls, attachment.URL)
 	}
 
-	if msg.ReferencedMessage != nil {
-		for _, attachment := range msg.ReferencedMessage.Attachments {
+	refrence := ctx.GetReferenceMsg()
+	if refrence != nil {
+		for _, attachment := range refrence.Attachments {
 			urls = append(urls, attachment.URL)
 		}
 
-		matches := regex.FindAllString(msg.ReferencedMessage.Content, -1)
+		matches := regex.FindAllString(refrence.Content, -1)
 		urls = append(urls, matches...)
 	}
 

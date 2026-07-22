@@ -12,7 +12,6 @@ import (
 	"requiem/utils"
 	"requiem/utils/discord"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/hajimehoshi/go-mp3"
 	"github.com/hajimehoshi/oto"
 )
@@ -22,10 +21,10 @@ var (
 	inited  bool = false
 )
 
-func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
-	urls := discord.GetUrls(msg)
+func (*AudioCommand) Exec(ctx *store.CommandContext, args []string) {
+	urls := discord.GetUrls(ctx)
 	if len(urls) == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any urls.")
 		return
 	}
 
@@ -42,13 +41,13 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 	}
 
 	if theUrl == "" {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any audio files.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any audio files.")
 		return
 	}
 
 	path, err := utils.DownloadFile(theUrl, "")
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to download - %s", err))
 		return
 	}
 
@@ -56,7 +55,7 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	file, err := os.Open(path)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open file - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to open file - %s", err))
 		return
 	}
 
@@ -64,21 +63,21 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	decoder, err := mp3.NewDecoder(file)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to decode audio - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to decode audio - %s", err))
 		return
 	}
 
 	if !inited {
 		context, err = oto.NewContext(decoder.SampleRate(), 2, 2, 8192)
 		if err != nil {
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to create audio context - %s", err), msg.Reference())
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to create audio context - %s", err))
 			return
 		}
 
 		inited = true
 	}
 
-	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "Playing audio...", msg.Reference())
+	initial, _ := ctx.ReplyMsg("Playing audio...")
 
 	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
 		funcs.DisableInputs(true)
@@ -104,15 +103,15 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		}
 
 		if err != nil {
-			ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to read audio - %s", err), msg.Reference())
+			ctx.DeleteMsg(initial.ID)
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to read audio - %s", err))
 			return
 		}
 
 		_, err = player.Write(buffer[:at])
 		if err != nil {
-			ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to write audio data - %s", err), msg.Reference())
+			ctx.DeleteMsg(initial.ID)
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to write audio data - %s", err))
 			return
 		}
 	}
@@ -121,8 +120,8 @@ func (*AudioCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 		funcs.DisableInputs(false)
 	}
 
-	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully played audio.", msg.Reference())
+	ctx.DeleteMsg(initial.ID)
+	ctx.ReplyMsg("🟩 Successfully played audio.")
 }
 
 func (*AudioCommand) Name() string {

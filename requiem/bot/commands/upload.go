@@ -6,32 +6,33 @@ import (
 	"path/filepath"
 	"strings"
 
+	"requiem/store"
 	"requiem/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-const MAX_FILE_SIZE int64 = 8 * 1024 * 1024
+const _MAX_FILE_SIZE int64 = 8 * 1024 * 1024
 
-func (*UploadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*UploadCommand) Exec(ctx *store.CommandContext, args []string) {
 	message := strings.Join(args, " ")
 	path := utils.UnwrapQuotes(message)
 
 	info, err := os.Stat(path)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Invalid path.", msg.Reference())
+		ctx.ReplyMsg("🟥 Invalid path.")
 		return
 	}
 
 	var toUpload string
 
-	initial, _ := ses.ChannelMessageSendReply(msg.ChannelID, "Uploading...", msg.Reference())
+	initial, _ := ctx.ReplyMsg("Uploading...")
 
 	if info.IsDir() {
 		zip, err := utils.ZipDir(path)
 		if err != nil {
-			ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-			ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to zip directory - %s", err), msg.Reference())
+			ctx.DeleteMsg(initial.ID)
+			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to zip directory - %s", err))
 			return
 		}
 
@@ -42,26 +43,26 @@ func (*UploadCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate,
 	}
 
 	info, err = os.Stat(toUpload)
-	if err == nil && info.Size() > MAX_FILE_SIZE {
-		over := info.Size() - MAX_FILE_SIZE
-		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 File too large by %d bytes.", over), msg.Reference())
+	if err == nil && info.Size() > _MAX_FILE_SIZE {
+		over := info.Size() - _MAX_FILE_SIZE
+		ctx.DeleteMsg(initial.ID)
+		ctx.ReplyMsg(fmt.Sprintf("🟥 File too large by %d bytes.", over))
 		return
 	}
 
 	file, err := os.Open(toUpload)
 	if err != nil {
-		ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to open file - %s", err), msg.Reference())
+		ctx.DeleteMsg(initial.ID)
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to open file - %s", err))
 		return
 	}
 
 	defer file.Close()
 
-	ses.ChannelMessageDelete(msg.ChannelID, initial.ID)
-	ses.ChannelMessageSendComplex(msg.ChannelID, &discordgo.MessageSend{
+	ctx.DeleteMsg(initial.ID)
+	ctx.SendComplexMsg(&discordgo.MessageSend{
 		Content:   "🟩 Successfully uploaded.",
-		Reference: msg.Reference(),
+		Reference: ctx.Message.Reference(),
 		Files: []*discordgo.File{
 			{
 				Name:   filepath.Base(toUpload),

