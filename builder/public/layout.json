@@ -31,6 +31,14 @@
             "name": "Tracking ID",
             "info": "A custom ID/code to help you keep track of this build.",
             "type": "text"
+        },
+        {
+            "type": "separator"
+        },
+        {
+            "name": "Add buttons to replies",
+            "info": "Adds buttons to some of the bot's replies to make follow up actions easier.",
+            "type": "checkbox"
         }
     ],
     "setup": [
