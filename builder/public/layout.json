@@ -194,11 +194,8 @@
             "type": "checkbox"
         },
         {
-            "type": "separator"
-        },
-        {
-            "name": "Pad encrypted data",
-            "info": "Inserts dummy characters randomly in all encrypted data.",
+            "name": "Build as x86",
+            "info": "Builds Requiem as a 32-bit process instead of a 64-bit one.",
             "type": "checkbox"
         }
     ]

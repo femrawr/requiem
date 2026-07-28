@@ -1,17 +1,20 @@
 package utils
 
 import (
+	utils_execute "builder/utils/execute"
 	"fmt"
 	"os/exec"
-	"syscall"
 )
 
-func RunCommand(dir string, program string, args ...string) error {
+func RunCommand(dir string, program string, env []string, args ...string) error {
 	cmd := exec.Command(program, args...)
 	cmd.Dir = dir
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		HideWindow: true,
+
+	if env != nil {
+		cmd.Env = env
 	}
+
+	utils_execute.SetCmdHidden(cmd)
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {

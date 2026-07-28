@@ -54,6 +54,7 @@ type configBody struct {
 
 	ObfuscateBuild bool `json:"obfuscate_build"`
 	PackBuild      bool `json:"pack_build"`
+	BuildAs32Bit   bool `json:"build_as_x86"`
 }
 
 func updateConfig() {
@@ -134,6 +135,7 @@ func updateConfig() {
 
 		store.Obfuscate = body.ObfuscateBuild
 		store.Pack = body.PackBuild
+		store.BuildAs32Bit = body.BuildAs32Bit
 
 		utils.ReplaceString(&content, "LAUNCH_KEY", utils.GenString(_LAUNCH_KEY_LEN))
 		utils.ReplaceString(&content, "MUTEX_NAME", utils.GenString(_MUTEX_NAME_LEN))

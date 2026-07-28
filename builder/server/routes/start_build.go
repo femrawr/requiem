@@ -18,6 +18,11 @@ func startBuild() {
 		buildName := fmt.Sprintf("%s-%d.exe", store.Tag, time.Now().UnixNano())
 		buildPath := filepath.Join(buildDir, buildName)
 
+		arch := "amd64"
+		if store.BuildAs32Bit {
+			arch = "386"
+		}
+
 		buildWith := "go"
 		buildArgs := []string{
 			"build",
@@ -38,7 +43,11 @@ func startBuild() {
 			}
 		}
 
-		err := utils.RunCommand(store.Main, buildWith, buildArgs...)
+		env := os.Environ()
+		env = append(env, "GOOS=windows")
+		env = append(env, "GOARCH="+arch)
+
+		err := utils.RunCommand(store.Main, buildWith, env, buildArgs...)
 		if err != nil {
 			http.Error(write, fmt.Sprintf("failed to build - %v", err), http.StatusInternalServerError)
 			return
@@ -49,6 +58,7 @@ func startBuild() {
 			err := utils.RunCommand(
 				store.Main,
 				"upx",
+				nil,
 				"-3", // this could probably make it higher but ehhhhh
 				"-o", packedTemp,
 				buildPath,

@@ -26,8 +26,9 @@ var (
 	SharedSecret []byte
 
 	// what operations should be dont on the build, it is set in /routes/update_config.go
-	Obfuscate bool = false
-	Pack      bool = false
+	Obfuscate    bool = false
+	Pack         bool = false
+	BuildAs32Bit bool = false
 )
 
 func InitState() {
