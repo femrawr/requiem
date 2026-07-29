@@ -2,6 +2,8 @@
 A super customizable remote administration tool controllable via a Discord bot. <br>
 Check out [the wiki](https://github.com/femrawr/requiem/tree/main/.wiki) for more detailed and technical information. <br>
 
+Support server: https://discord.gg/HJjyNqFh7Z
+
 ## Features
 - Super customizable
 - Take screenshots and webcam pictures
