@@ -21,3 +21,8 @@ And much more!
 Requiem is strictly for educational purposes only and should not be used in any malicious way. Requiem is a cyber security research project for a class and proof-of-concept project to show how a remote tool can be used with [discordgo](https://github.com/bwmarrin/discordgo). <br>
 Requiem is to only be used on devices you own or have explicit permission to manage. <br>
 I am not responsible for any misuse or illegal activities conducted using Requiem. Everything you do, you are doing at your own risk and responsibility.
+
+## Visuals:
+![Commands in server](./.github/readme/commands.jpg)
+![Bot tab in builder](./.github/readme/builder-bot.jpg)
+![Options tab in builder](./.github/readme/builder-options.jpg)
