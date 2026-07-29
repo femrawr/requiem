@@ -14,6 +14,8 @@ import (
 
 func startBuild() {
 	http.HandleFunc("/api/start-build", func(write http.ResponseWriter, req *http.Request) {
+		utils.LogInfo("building...")
+
 		buildDir := filepath.Join(store.Root, ".builds")
 		buildName := fmt.Sprintf("%s-%d.exe", store.Tag, time.Now().UnixNano())
 		buildPath := filepath.Join(buildDir, buildName)
@@ -88,10 +90,13 @@ func startBuild() {
 
 			err = os.WriteFile(buildPath, data, 0666)
 			if err != nil {
-				http.Error(write, fmt.Sprintf("failed mangle packed build - %v", err), http.StatusInternalServerError)
+				http.Error(write, fmt.Sprintf("failed to mangle packed build - %v", err), http.StatusInternalServerError)
 				return
 			}
 		}
+
+		utils.LogInfo("finished build")
+		utils.LogChunk()
 
 		write.WriteHeader(http.StatusOK)
 	})

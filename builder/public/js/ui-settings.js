@@ -238,14 +238,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.setAttribute('autocomplete', 'off');
     });
 
-    loadConfig(e2ePassword);
+    loadConfig(e2eePassword);
 
     const inputs = document.querySelectorAll('input');
     const selects = document.querySelectorAll('select');
 
     [...inputs, ...selects].forEach((input) => {
         input.addEventListener('input', async (e) => {
-            localStorage.setItem(CFG_NAME, await getConfig(e2ePassword));
+            if (!savingDisabled) {
+                localStorage.setItem(CFG_NAME, await getConfig(e2eePassword));
+            }
 
             const target = e.target;
             const value = (() => {
@@ -258,33 +260,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (target.id === 'end_to_end_encryption') {
                 if (value) {
-                    if (localStorage.getItem(E2E_NAME)) {
+                    if (localStorage.getItem(E2EE_NAME)) {
                         alert('End to end encryption is already active.');
                         return;
                     }
 
                     const password = prompt('Enter password to turn on end to end encryption');
-                    if (password === '') {
-                        notif('Password is empty.');
+                    if (password === '' || !password) {
+                        notif('Password is empty or cancelled.');
 
                         target.checked = false;
                         localStorage.setItem(CFG_NAME, await getConfig());
                         return;
                     }
 
-                    e2ePassword = password;
+                    e2eePassword = password;
 
-                    localStorage.setItem(CFG_NAME, await getConfig(e2ePassword));
+                    localStorage.setItem(CFG_NAME, await getConfig(e2eePassword));
 
                     // this is for when the page reloads and the saved config has to be decrypted
                     // this will verify is the password is correct
                     localStorage.setItem(
-                        E2E_NAME,
-                        await encryptData(E2E_VERIFICATION_STRING, e2ePassword)
+                        E2EE_NAME,
+                        await encryptData(E2EE_VERIFICATION_STRING, e2eePassword)
                     );
                 } else {
                     localStorage.setItem(CFG_NAME, await getConfig());
-                    localStorage.removeItem(E2E_NAME);
+                    localStorage.removeItem(E2EE_NAME);
+                }
+            } else if (target.id === 'save_config') {
+                target.checked = !savingDisabled;
+
+                savingDisabled = !value;
+
+                if (value) {
+                    localStorage.setItem(CFG_NAME, await getConfig(e2eePassword));
+                } else {
+                    localStorage.setItem(CFG_NAME, false);
                 }
             }
         });

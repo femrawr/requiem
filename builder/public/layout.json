@@ -165,8 +165,7 @@
         {
             "name": "Registry",
             "info": "Uses the Run key in the Registry, It will also enable itself if it was disabled from e.g. Task Manager.",
-            "type": "checkbox",
-            "value": "true"
+            "type": "checkbox"
         }
     ],
     "site": [
@@ -179,7 +178,7 @@
             "name": "Save config",
             "info": "Saved the data set in the site.",
             "type": "checkbox",
-            "value": "true"
+            "value": true
         }
     ],
     "build": [

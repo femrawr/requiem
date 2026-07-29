@@ -1,29 +1,31 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"builder/routes"
 	"builder/store"
+	"builder/utils"
 )
 
 func main() {
 	server := http.FileServer(http.Dir("../public"))
 	http.Handle("/", server)
 
-	store.InitState()
-	routes.RegisterRoutes()
-
-	if store.DEBUG {
-		fmt.Println("requiem root - " + store.Root)
+	err := store.InitState()
+	if err != nil {
+		utils.LogError("failed to init state -", err)
+		return
 	}
 
-	fmt.Println("listening on http://localhost:" + store.PORT)
+	routes.RegisterRoutes()
 
-	err := http.ListenAndServe(":"+store.PORT, nil)
+	utils.LogDebug("requiem root:", store.Root)
+	utils.LogInfo("listening on http://localhost:" + store.PORT)
+
+	err = http.ListenAndServe(":"+store.PORT, nil)
 	if err != nil {
-		fmt.Printf("failed to start server: %s", err)
+		utils.LogError("failed to start server -", err)
 		return
 	}
 }

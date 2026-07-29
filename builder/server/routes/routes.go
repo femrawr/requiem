@@ -4,5 +4,5 @@ func RegisterRoutes() {
 	startBuild()
 	updateConfig()
 	getVersion()
-	getE2EKey()
+	getE2EEKey()
 }

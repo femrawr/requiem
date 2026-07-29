@@ -59,11 +59,11 @@ type configBody struct {
 
 func updateConfig() {
 	http.HandleFunc("/api/update-config", func(write http.ResponseWriter, req *http.Request) {
-		config := filepath.Join(store.Main, "store", "config.go")
+		utils.LogChunk()
+		utils.LogInfo("updating config...")
 
-		if store.DEBUG {
-			fmt.Println("requiem config file - " + config)
-		}
+		config := filepath.Join(store.Main, "store", "config.go")
+		utils.LogDebug("requiem config file:", config)
 
 		var rawBody map[string]any
 
@@ -127,11 +127,7 @@ func updateConfig() {
 
 		cryptKey1 := utils.GenString(_CRYPTO_KEY_LEN)
 		cryptKey2 := utils.GenString(_CRYPTO_KEY_LEN)
-		cryptKey := shared.InitKey(cryptKey1, cryptKey2)
-
-		if store.DEBUG {
-			fmt.Printf("crypto key - %x\n", cryptKey)
-		}
+		shared.InitKey(cryptKey1, cryptKey2)
 
 		store.Obfuscate = body.ObfuscateBuild
 		store.Pack = body.PackBuild
@@ -173,6 +169,8 @@ func updateConfig() {
 		}
 
 		store.Tag = body.Tag
+
+		utils.LogInfo("updated config")
 
 		write.WriteHeader(http.StatusOK)
 	})

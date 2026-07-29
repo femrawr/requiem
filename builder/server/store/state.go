@@ -1,7 +1,6 @@
 package store
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -31,14 +30,14 @@ var (
 	BuildAs32Bit bool = false
 )
 
-func InitState() {
+func InitState() error {
 	path, err := os.Executable()
 	if err != nil {
-		fmt.Printf("failed to get the path of the executable - %s", err)
-		return
+		return err
 	}
 
 	Root = filepath.Join(path, "..", "..", "..")
-
 	Main = filepath.Join(Root, "requiem")
+
+	return nil
 }

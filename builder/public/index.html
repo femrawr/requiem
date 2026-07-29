@@ -58,29 +58,31 @@
     <script>
         const TAG_NAME = 'req.tag';
         const CFG_NAME = 'req.cfg';
-        const E2E_NAME = 'req.e2e';
+        const E2EE_NAME = 'req.e2ee';
 
         const NOTIF_SUCC = 'success';
         const NOTIF_INFO = 'info';
         const NOTIF_WARN = 'warning';
         const NOTIF_ERROR = 'error';
 
-        const E2E_VERIFICATION_STRING = 'verify00?';
+        const E2EE_VERIFICATION_STRING = 'requiem e2ee verification string';
 
-        let e2ePassword = undefined;
+        let e2eePassword = undefined;
 
-        const e2eVerification = localStorage.getItem(E2E_NAME);
-        if (e2eVerification) {
+        let savingDisabled = localStorage.getItem(CFG_NAME) === 'false';
+
+        const e2eeVerification = localStorage.getItem(E2EE_NAME);
+        if (e2eeVerification) {
             const password = prompt('Enter password to decrypt data');
             if (password === '') {
                 alert('Password is empty.');
                 location.reload();
             }
 
-            e2ePassword = password;
+            e2eePassword = password;
 
             (async () => {
-                await decryptData(e2eVerification, e2ePassword)
+                await decryptData(e2eeVerification, e2eePassword)
                     .catch((err) => {
                         alert('Password is invalid.');
                         location.reload();

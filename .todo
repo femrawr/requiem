@@ -1,8 +1,5 @@
 builder:
 - detect and remove upx version
-- impl saving toggle
-- if no password for e2ee, disable it
-- better build console info
 
 requiem:
 - rename option for file

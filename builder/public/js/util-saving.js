@@ -1,6 +1,8 @@
 const KEY_SEPARATOR = '!';
 
 const getConfig = async (password) => {
+    if (savingDisabled) return;
+
     const config = {
         tag: localStorage.getItem(TAG_NAME)
     };
@@ -33,6 +35,8 @@ const getConfig = async (password) => {
 };
 
 const loadConfig = async (password) => {
+    if (savingDisabled) return;
+
     const saved = localStorage.getItem(CFG_NAME);
     if (!saved) return;
 

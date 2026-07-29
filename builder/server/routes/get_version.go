@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"builder/store"
+	"builder/utils"
 )
 
 type version struct {
@@ -18,10 +19,7 @@ type version struct {
 func getVersion() {
 	http.HandleFunc("/api/get-version", func(write http.ResponseWriter, req *http.Request) {
 		versionFile := filepath.Join(store.Root, "builder", "version.json")
-
-		if store.DEBUG {
-			fmt.Println("builder versions file - " + versionFile)
-		}
+		utils.LogDebug("builder versions file:", versionFile)
 
 		data, err := os.ReadFile(versionFile)
 		if err != nil {

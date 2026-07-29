@@ -15,7 +15,7 @@ type keyBody struct {
 	Key string `json:"key"`
 }
 
-func getE2EKey() {
+func getE2EEKey() {
 	http.HandleFunc("/api/get-key", func(write http.ResponseWriter, req *http.Request) {
 		var body keyBody
 
