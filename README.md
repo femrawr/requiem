@@ -22,7 +22,7 @@ Requiem is strictly for educational purposes only and should not be used in any 
 Requiem is to only be used on devices you own or have explicit permission to manage. <br>
 I am not responsible for any misuse or illegal activities conducted using Requiem. Everything you do, you are doing at your own risk and responsibility.
 
-## Visuals:
+## Visuals
 ![Commands in server](./.github/readme/commands.jpg)
 ![Bot tab in builder](./.github/readme/builder-bot.jpg)
 ![Options tab in builder](./.github/readme/builder-options.jpg)
