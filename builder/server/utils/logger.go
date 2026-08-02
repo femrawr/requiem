@@ -32,24 +32,24 @@ func LogChunk() {
 
 func LogInfo(msg string, args ...any) {
 	if len(args) == 0 {
-		fmt.Printf(logInfo("[INFO] %s\n", msg))
+		fmt.Print(logInfo("[INFO] %s\n", msg))
 	} else {
-		fmt.Printf(logInfo("[INFO] %s %s\n", msg, fmt.Sprint(args...)))
+		fmt.Print(logInfo("[INFO] %s %s\n", msg, fmt.Sprint(args...)))
 	}
 }
 
 func LogWarning(msg string, args ...any) {
 	if len(args) == 0 {
-		fmt.Printf(logWarn("[WARN] %s\n", msg))
+		fmt.Print(logWarn("[WARN] %s\n", msg))
 	} else {
-		fmt.Printf(logWarn("[WARN] %s %s\n", msg, fmt.Sprint(args...)))
+		fmt.Print(logWarn("[WARN] %s %s\n", msg, fmt.Sprint(args...)))
 	}
 }
 
 func LogError(msg string, args ...any) {
 	if len(args) == 0 {
-		fmt.Printf(logError("[ERROR] %s\n", msg))
+		fmt.Print(logError("[ERROR] %s\n", msg))
 	} else {
-		fmt.Printf(logError("[ERROR] %s %s\n", msg, fmt.Sprint(args...)))
+		fmt.Print(logError("[ERROR] %s %s\n", msg, fmt.Sprint(args...)))
 	}
 }
