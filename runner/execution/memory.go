@@ -39,6 +39,9 @@ const (
 	_PAGE_EXECUTE           uint32 = 0x10
 	_PAGE_EXECUTE_READ      uint32 = 0x20
 	_PAGE_EXECUTE_READWRITE uint32 = 0x40
+
+	_MEM_COMMIT  uint32 = 0x1000
+	_MEM_RESERVE uint32 = 0x2000
 )
 
 type dosHeader struct {
@@ -632,23 +635,23 @@ func (ctx *execContext) Execute() error {
 	return nil
 }
 
-func ExecuteInMemory(bytes []byte) error {
-	if len(bytes) < int(unsafe.Sizeof(dosHeader{})) {
+func ExecuteInMemory(execBytes []byte) error {
+	if len(execBytes) < int(unsafe.Sizeof(dosHeader{})) {
 		return errors.New("file is too small")
 	}
 
-	dos := (*dosHeader)(unsafe.Pointer(&bytes[0]))
+	dos := (*dosHeader)(unsafe.Pointer(&execBytes[0]))
 	if dos.E_magic != _IMAGE_DOS_SIGNATURE {
 		return errors.New("invalid DOS sigiture")
 	}
 
-	nt := (*ntHeader32)(unsafe.Pointer(&bytes[dos.E_lfanew]))
+	nt := (*ntHeader32)(unsafe.Pointer(&execBytes[dos.E_lfanew]))
 	if nt.Signature != _IMAGE_NT_SIGNATURE {
 		return errors.New("invalid NT signature")
 	}
 
 	context := &execContext{
-		data:    bytes,
+		data:    execBytes,
 		x64:     nt.OptionalHeader.Magic == 0x20B,
 		modules: make(map[string]uintptr),
 	}
@@ -657,7 +660,7 @@ func ExecuteInMemory(bytes []byte) error {
 	var headerSize uint32
 
 	if context.x64 {
-		context.ntHeaders64 = (*ntHeader64)(unsafe.Pointer(&bytes[dos.E_lfanew]))
+		context.ntHeaders64 = (*ntHeader64)(unsafe.Pointer(&execBytes[dos.E_lfanew]))
 		context.dll = context.ntHeaders64.FileHeader.Characteristics&_IMAGE_FILE_DLL != 0
 
 		imageSize = context.ntHeaders64.OptionalHeader.SizeOfImage
@@ -670,14 +673,20 @@ func ExecuteInMemory(bytes []byte) error {
 		headerSize = context.ntHeaders32.OptionalHeader.SizeOfHeaders
 	}
 
-	base, _, err := store.VirtualAlloc.Call(uintptr(imageSize))
+	base, _, err := store.VirtualAlloc.Call(
+		0,
+		uintptr(imageSize),
+		uintptr(_MEM_COMMIT|_MEM_RESERVE),
+		uintptr(_PAGE_EXECUTE_READWRITE),
+	)
+
 	if base == 0 {
-		return err
+		return fmt.Errorf("failed to allocate for base: %v", err)
 	}
 
 	context.base = base
 
-	copy(unsafe.Slice((*byte)(unsafe.Pointer(base)), headerSize), bytes[:headerSize])
+	copy(unsafe.Slice((*byte)(unsafe.Pointer(base)), headerSize), execBytes[:headerSize])
 
 	if context.x64 {
 		context.ntHeaders64 = (*ntHeader64)(unsafe.Pointer(base + uintptr(dos.E_lfanew)))
@@ -702,44 +711,48 @@ func ExecuteInMemory(bytes []byte) error {
 		)
 
 		if section.VirtualSize > section.SizeOfRawData {
-			tail := unsafe.Slice((*byte)(unsafe.Pointer(offset+size)), uintptr(section.VirtualSize)-size)
+			tail := unsafe.Slice(
+				(*byte)(unsafe.Pointer(offset+size)),
+				uintptr(section.VirtualSize)-size,
+			)
+
 			clear(tail)
 		}
 	}
 
 	err = context.HandleRelocations()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle relocations: %v", err)
 	}
 
 	err = context.HandleImports()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle imports: %v", err)
 	}
 
 	err = context.HandleLateImports()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle late imports: %v", err)
 	}
 
 	err = context.HandleProtections()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle protections: %v", err)
 	}
 
 	err = context.HandleExceptions()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle exceptions: %v", err)
 	}
 
 	err = context.HandleTLS()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to handle thread storage: %v", err)
 	}
 
 	err = context.Execute()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to execute: %v", err)
 	}
 
 	return nil
