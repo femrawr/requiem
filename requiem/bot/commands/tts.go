@@ -17,7 +17,7 @@ func (*SpeakCommand) Exec(ctx *store.CommandContext, args []string) {
 	}
 
 	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
-		funcs.DisableInputs(true)
+		funcs.SetInputsDisabled(true)
 	}
 
 	if store.RuntimeSettings.AudioUnmuteBeforePlay {
@@ -35,7 +35,7 @@ func (*SpeakCommand) Exec(ctx *store.CommandContext, args []string) {
 	)
 
 	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
-		funcs.DisableInputs(false)
+		funcs.SetInputsDisabled(false)
 	}
 
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"requiem/store"
 )
 
-func DisableInputs(disable bool) error {
+func SetInputsDisabled(disable bool) error {
 	if !store.IsAdmin {
 		return errors.New("administrator privileges are required to do this")
 	}

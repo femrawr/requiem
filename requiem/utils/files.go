@@ -2,13 +2,48 @@ package utils
 
 import (
 	"archive/zip"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"requiem/store"
 )
+
+func CreateADS(hostFilePath string, name string) (string, error) {
+	fullHash := sha256.Sum256([]byte(name))
+	nameHash := hex.EncodeToString(fullHash[:])[:12]
+
+	var adsPath string
+
+	if store.DEBUG_MODE {
+		hostParent := filepath.Dir(hostFilePath)
+		hostName := filepath.Base(hostFilePath)
+
+		adsPath = filepath.Join(hostParent, hostName+"_ads_"+name+"_"+nameHash)
+	} else {
+		adsPath = hostFilePath + ":" + nameHash
+	}
+
+	_, err := os.Stat(adsPath)
+	if err == nil {
+		DebugLog(fmt.Sprintf("ads %q already exists as %q", name, adsPath))
+		return adsPath, nil
+	}
+
+	file, err := os.Create(adsPath)
+	if err != nil {
+		return "", err
+	}
+
+	file.Close()
+
+	return adsPath, nil
+}
 
 func CopyFile(srcPath string, outPath string) error {
 	src, err := os.Open(srcPath)

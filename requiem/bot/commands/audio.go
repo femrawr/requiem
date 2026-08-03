@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/settings"
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
@@ -79,15 +80,15 @@ func (*AudioCommand) Exec(ctx *store.CommandContext, args []string) {
 
 	initial, _ := ctx.ReplyMsg("Playing audio...")
 
-	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
-		funcs.DisableInputs(true)
+	if settings.RuntimeSettings.AudioDisableInputsUntilFinished {
+		funcs.SetInputsDisabled(true)
 	}
 
-	if store.RuntimeSettings.AudioUnmuteBeforePlay {
+	if settings.RuntimeSettings.AudioUnmuteBeforePlay {
 		funcs.SetMuted(false)
 	}
 
-	if store.RuntimeSettings.AudioMaxVolumeBeforePlay {
+	if settings.RuntimeSettings.AudioMaxVolumeBeforePlay {
 		funcs.SetVolume(1)
 	}
 
@@ -116,8 +117,10 @@ func (*AudioCommand) Exec(ctx *store.CommandContext, args []string) {
 		}
 	}
 
-	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
-		funcs.DisableInputs(false)
+	if settings.RuntimeSettings.AudioDisableInputsUntilFinished {
+		// see /bot/commands/input.go @ } else if utils.HasFlag(content, "unblock") {
+		funcs.SetInputsDisabled(true)
+		funcs.SetInputsDisabled(false)
 	}
 
 	ctx.DeleteMsg(initial.ID)

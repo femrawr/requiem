@@ -76,7 +76,7 @@ func (*InputCommand) Exec(ctx *store.CommandContext, args []string) {
 	var err error
 
 	if utils.HasFlag(content, "block") {
-		err = funcs.DisableInputs(true)
+		err = funcs.SetInputsDisabled(true)
 	} else if utils.HasFlag(content, "unblock") {
 		// BlockInput(false) can only unblock blocked input
 		// if it was blocked in the same thread
@@ -85,8 +85,8 @@ func (*InputCommand) Exec(ctx *store.CommandContext, args []string) {
 		// spawns a new thread we need to BlockInput(true) before
 		// unblocking it
 
-		funcs.DisableInputs(true)
-		err = funcs.DisableInputs(false)
+		funcs.SetInputsDisabled(true)
+		err = funcs.SetInputsDisabled(false)
 	} else {
 		ctx.ReplyMsg("🟥 Invalid flag.")
 		return
