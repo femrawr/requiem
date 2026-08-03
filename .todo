@@ -1,5 +1,6 @@
 builder:
 - detect and remove upx version
+- option to reset edited config file
 
 requiem:
 - rename option for file
@@ -29,6 +30,7 @@ requiem:
 - impl randomize persistence file location
 - see resource monitor http trafic
 - fix update module
+- made ads' not ads when in debug mode
 
 modules/runner
 - reorder structs
