@@ -8,6 +8,7 @@ import (
 
 	"requiem/funcs"
 	"requiem/macro"
+	"requiem/settings"
 	"requiem/store"
 	"requiem/utils"
 	"requiem/utils/discord"
@@ -54,7 +55,7 @@ func Start() {
 	}
 
 	macro.LoadMacros()
-	store.LoadSettings()
+	settings.LoadSettings()
 
 	registerCommands()
 	registerButtons()

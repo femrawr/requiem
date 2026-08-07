@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"requiem/settings"
 	"requiem/store"
 	"requiem/utils"
 )
@@ -27,7 +28,7 @@ func (*SettingsCommand) Exec(ctx *store.CommandContext, args []string) {
 		value := args[len(args)-1]
 		found := false
 
-		theValue := reflect.ValueOf(&store.RuntimeSettings).Elem()
+		theValue := reflect.ValueOf(&settings.RuntimeSettings).Elem()
 		theType := theValue.Type()
 
 		for i := 0; i < theType.NumField(); i++ {
@@ -62,7 +63,7 @@ func (*SettingsCommand) Exec(ctx *store.CommandContext, args []string) {
 			return
 		}
 
-		err := store.SaveSettings()
+		err := settings.SaveSettings()
 		if err != nil {
 			ctx.ReplyMsg(fmt.Sprintf("🟥 Failed to save - %s", err))
 			return
@@ -79,7 +80,7 @@ func (*SettingsCommand) Exec(ctx *store.CommandContext, args []string) {
 			return
 		}
 
-		theValue := reflect.ValueOf(store.RuntimeSettings)
+		theValue := reflect.ValueOf(settings.RuntimeSettings)
 		theType := theValue.Type()
 
 		for i := 0; i < theType.NumField(); i++ {
@@ -99,7 +100,7 @@ func (*SettingsCommand) Exec(ctx *store.CommandContext, args []string) {
 	if utils.HasFlag(content, "list") {
 		theSettings := map[string]any{}
 
-		theValue := reflect.ValueOf(store.RuntimeSettings)
+		theValue := reflect.ValueOf(settings.RuntimeSettings)
 		theType := theValue.Type()
 
 		for i := 0; i < theType.NumField(); i++ {

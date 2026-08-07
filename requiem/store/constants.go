@@ -2,7 +2,7 @@ package store
 
 const (
 	VERSION_UPDATE int = 18
-	VERSION_PATCH  int = 4
+	VERSION_PATCH  int = 5
 )
 
 const (

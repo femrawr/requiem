@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"requiem/funcs"
+	"requiem/settings"
 	"requiem/store"
 	"requiem/utils"
 )
@@ -16,15 +17,15 @@ func (*SpeakCommand) Exec(ctx *store.CommandContext, args []string) {
 		return
 	}
 
-	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
+	if settings.RuntimeSettings.AudioDisableInputsUntilFinished {
 		funcs.SetInputsDisabled(true)
 	}
 
-	if store.RuntimeSettings.AudioUnmuteBeforePlay {
+	if settings.RuntimeSettings.AudioUnmuteBeforePlay {
 		funcs.SetMuted(false)
 	}
 
-	if store.RuntimeSettings.AudioMaxVolumeBeforePlay {
+	if settings.RuntimeSettings.AudioMaxVolumeBeforePlay {
 		funcs.SetVolume(1)
 	}
 
@@ -34,7 +35,7 @@ func (*SpeakCommand) Exec(ctx *store.CommandContext, args []string) {
 		fmt.Sprintf("Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('%s')", content),
 	)
 
-	if store.RuntimeSettings.AudioDisableInputsUntilFinished {
+	if settings.RuntimeSettings.AudioDisableInputsUntilFinished {
 		funcs.SetInputsDisabled(false)
 	}
 
